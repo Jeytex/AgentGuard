@@ -1,0 +1,1301 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AgentGuard \u2014 Sub-10ms Agent Security Layer",
+    "description": "Real-time enterprise policy and safety gateway for autonomous AI agents. Powered by Moss in-process sub-10ms hybrid semantic search.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/v1/guard/evaluate": {
+      "post": {
+        "summary": "Evaluate an AI agent action against Moss security policies in <10ms",
+        "operationId": "evaluate_action_api_v1_guard_evaluate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActionEvaluationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionEvaluationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/policies": {
+      "get": {
+        "summary": "List all security policies loaded in AgentGuard and indexed in Moss",
+        "operationId": "list_policies_api_v1_policies_get",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by policy category",
+              "title": "Category"
+            },
+            "description": "Filter by policy category"
+          },
+          {
+            "name": "enforcement",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by enforcement verdict",
+              "title": "Enforcement"
+            },
+            "description": "Filter by enforcement verdict"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Policy"
+                  },
+                  "title": "Response List Policies Api V1 Policies Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create and dynamically index a new policy into Moss runtime",
+        "operationId": "create_policy_api_v1_policies_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PolicyCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Policy"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/policies/seed": {
+      "post": {
+        "summary": "Re-index all 15+ pre-configured enterprise policies into Moss runtime",
+        "operationId": "seed_policies_endpoint_api_v1_policies_seed_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/approvals/pending": {
+      "get": {
+        "summary": "Fetch all actions currently paused in PENDING state awaiting human approval",
+        "operationId": "get_pending_approvals_api_v1_approvals_pending_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PendingApproval"
+                  },
+                  "type": "array",
+                  "title": "Response Get Pending Approvals Api V1 Approvals Pending Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/approvals/{approval_id}/decide": {
+      "post": {
+        "summary": "Human reviewer submits decision (APPROVE or REJECT) on a paused action",
+        "operationId": "decide_approval_api_v1_approvals__approval_id__decide_post",
+        "parameters": [
+          {
+            "name": "approval_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Approval UUID",
+              "title": "Approval Id"
+            },
+            "description": "Approval UUID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApprovalDecisionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApprovalDecisionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/benchmark": {
+      "post": {
+        "summary": "Execute side-by-side latency test: In-Process Moss (<10ms) vs Remote Vector DB",
+        "operationId": "run_latency_benchmark_api_v1_benchmark_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BenchmarkRequest",
+                "default": {
+                  "iterations": 50,
+                  "warmup": 5
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BenchmarkResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/simulator/scenarios": {
+      "get": {
+        "summary": "Get pre-built simulation scenarios for live judging demonstrations",
+        "operationId": "list_simulation_scenarios_api_v1_simulator_scenarios_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SimulationScenario"
+                  },
+                  "type": "array",
+                  "title": "Response List Simulation Scenarios Api V1 Simulator Scenarios Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/simulator/run": {
+      "post": {
+        "summary": "Run a simulation scenario and return evaluation result",
+        "operationId": "run_scenario_api_v1_simulator_run_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScenarioRunRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionEvaluationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "summary": "Check AgentGuard health, Moss connection state, and uptime",
+        "operationId": "health_check_api_v1_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemHealth"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/interceptions": {
+      "get": {
+        "summary": "Fetch all real intercepted agent actions recorded in SQLite audit log",
+        "operationId": "list_interceptions_api_v1_interceptions_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/agents": {
+      "get": {
+        "summary": "Get monitored autonomous AI agents and their live operational status",
+        "operationId": "list_monitored_agents_api_v1_agents_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AgentInfo"
+                  },
+                  "type": "array",
+                  "title": "Response List Monitored Agents Api V1 Agents Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "summary": "Root endpoint",
+        "operationId": "root__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ActionEvaluationRequest": {
+        "properties": {
+          "agent_id": {
+            "type": "string",
+            "title": "Agent Id",
+            "example": "customer-support-bot"
+          },
+          "agent_role": {
+            "type": "string",
+            "title": "Agent Role",
+            "example": "tier_1_support"
+          },
+          "tool_name": {
+            "type": "string",
+            "title": "Tool Name",
+            "example": "stripe_issue_refund"
+          },
+          "parameters": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Parameters",
+            "example": {
+              "amount": 1500,
+              "customer_id": "cust_88219"
+            }
+          },
+          "context": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Context",
+            "example": "Customer requested full refund due to order delay."
+          },
+          "dry_run": {
+            "type": "boolean",
+            "title": "Dry Run",
+            "description": "If true, do not persist to audit log or trigger real approvals",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_id",
+          "agent_role",
+          "tool_name"
+        ],
+        "title": "ActionEvaluationRequest"
+      },
+      "ActionEvaluationResponse": {
+        "properties": {
+          "action_id": {
+            "type": "string",
+            "title": "Action Id"
+          },
+          "verdict": {
+            "$ref": "#/components/schemas/GuardVerdict"
+          },
+          "risk_level": {
+            "$ref": "#/components/schemas/RiskLevel"
+          },
+          "risk_score": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Risk Score"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "matched_policies": {
+            "items": {
+              "$ref": "#/components/schemas/MatchedPolicy"
+            },
+            "type": "array",
+            "title": "Matched Policies"
+          },
+          "approval_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approval Id"
+          },
+          "execution_result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ToolExecutionResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "latency": {
+            "$ref": "#/components/schemas/LatencyBreakdown"
+          },
+          "timestamp": {
+            "type": "string",
+            "title": "Timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "action_id",
+          "verdict",
+          "risk_level",
+          "risk_score",
+          "reason",
+          "matched_policies",
+          "latency",
+          "timestamp"
+        ],
+        "title": "ActionEvaluationResponse"
+      },
+      "AgentInfo": {
+        "properties": {
+          "agent_id": {
+            "type": "string",
+            "title": "Agent Id"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "risk_level": {
+            "$ref": "#/components/schemas/RiskLevel"
+          },
+          "total_actions": {
+            "type": "integer",
+            "title": "Total Actions"
+          },
+          "last_action": {
+            "$ref": "#/components/schemas/AgentLastAction"
+          },
+          "allowed_tools": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Allowed Tools"
+          },
+          "restricted_tools": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Restricted Tools"
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_id",
+          "role",
+          "name",
+          "description",
+          "status",
+          "risk_level",
+          "total_actions",
+          "last_action",
+          "allowed_tools",
+          "restricted_tools"
+        ],
+        "title": "AgentInfo"
+      },
+      "AgentLastAction": {
+        "properties": {
+          "tool": {
+            "type": "string",
+            "title": "Tool"
+          },
+          "verdict": {
+            "$ref": "#/components/schemas/GuardVerdict"
+          },
+          "timestamp": {
+            "type": "string",
+            "title": "Timestamp"
+          },
+          "latency_ms": {
+            "type": "number",
+            "title": "Latency Ms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tool",
+          "verdict",
+          "timestamp",
+          "latency_ms"
+        ],
+        "title": "AgentLastAction"
+      },
+      "ApprovalDecisionRequest": {
+        "properties": {
+          "decision": {
+            "type": "string",
+            "pattern": "^(APPROVE|REJECT)$",
+            "title": "Decision"
+          },
+          "reviewer_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewer Notes"
+          },
+          "reviewed_by": {
+            "type": "string",
+            "title": "Reviewed By",
+            "example": "admin@agentguard.dev"
+          }
+        },
+        "type": "object",
+        "required": [
+          "decision",
+          "reviewed_by"
+        ],
+        "title": "ApprovalDecisionRequest"
+      },
+      "ApprovalDecisionResponse": {
+        "properties": {
+          "approval_id": {
+            "type": "string",
+            "title": "Approval Id"
+          },
+          "action_id": {
+            "type": "string",
+            "title": "Action Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "resolved_by": {
+            "type": "string",
+            "title": "Resolved By"
+          },
+          "resolved_at": {
+            "type": "string",
+            "title": "Resolved At"
+          },
+          "reviewer_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewer Notes"
+          },
+          "moss_memory_updated": {
+            "type": "boolean",
+            "title": "Moss Memory Updated",
+            "default": true
+          },
+          "execution_result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ToolExecutionResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "approval_id",
+          "action_id",
+          "status",
+          "resolved_by",
+          "resolved_at"
+        ],
+        "title": "ApprovalDecisionResponse"
+      },
+      "BenchmarkRequest": {
+        "properties": {
+          "iterations": {
+            "type": "integer",
+            "title": "Iterations",
+            "default": 50
+          },
+          "warmup": {
+            "type": "integer",
+            "title": "Warmup",
+            "default": 5
+          }
+        },
+        "type": "object",
+        "title": "BenchmarkRequest"
+      },
+      "BenchmarkResult": {
+        "properties": {
+          "total_queries": {
+            "type": "integer",
+            "title": "Total Queries"
+          },
+          "moss": {
+            "$ref": "#/components/schemas/LatencyStats"
+          },
+          "remote_vector_db": {
+            "$ref": "#/components/schemas/LatencyStats"
+          },
+          "speedup_factor": {
+            "type": "number",
+            "title": "Speedup Factor"
+          },
+          "timestamp": {
+            "type": "string",
+            "title": "Timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_queries",
+          "moss",
+          "remote_vector_db",
+          "speedup_factor",
+          "timestamp"
+        ],
+        "title": "BenchmarkResult"
+      },
+      "GuardVerdict": {
+        "type": "string",
+        "enum": [
+          "ALLOW",
+          "BLOCK",
+          "REQUIRE_APPROVAL"
+        ],
+        "title": "GuardVerdict"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "LatencyBreakdown": {
+        "properties": {
+          "moss_retrieval_ms": {
+            "type": "number",
+            "title": "Moss Retrieval Ms",
+            "description": "Moss retrieval latency in ms"
+          },
+          "rule_evaluation_ms": {
+            "type": "number",
+            "title": "Rule Evaluation Ms",
+            "description": "Fast-path rule evaluation latency in ms"
+          },
+          "total_latency_ms": {
+            "type": "number",
+            "title": "Total Latency Ms",
+            "description": "Total AgentGuard end-to-end latency in ms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "moss_retrieval_ms",
+          "rule_evaluation_ms",
+          "total_latency_ms"
+        ],
+        "title": "LatencyBreakdown"
+      },
+      "LatencyStats": {
+        "properties": {
+          "p50_ms": {
+            "type": "number",
+            "title": "P50 Ms"
+          },
+          "p95_ms": {
+            "type": "number",
+            "title": "P95 Ms"
+          },
+          "p99_ms": {
+            "type": "number",
+            "title": "P99 Ms"
+          },
+          "mean_ms": {
+            "type": "number",
+            "title": "Mean Ms"
+          },
+          "min_ms": {
+            "type": "number",
+            "title": "Min Ms"
+          },
+          "max_ms": {
+            "type": "number",
+            "title": "Max Ms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "p50_ms",
+          "p95_ms",
+          "p99_ms",
+          "mean_ms",
+          "min_ms",
+          "max_ms"
+        ],
+        "title": "LatencyStats"
+      },
+      "MatchedPolicy": {
+        "properties": {
+          "policy_id": {
+            "type": "string",
+            "title": "Policy Id"
+          },
+          "category": {
+            "$ref": "#/components/schemas/PolicyCategory"
+          },
+          "rule_text": {
+            "type": "string",
+            "title": "Rule Text"
+          },
+          "score": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Score",
+            "description": "Semantic similarity score"
+          },
+          "enforcement": {
+            "$ref": "#/components/schemas/GuardVerdict"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "policy_id",
+          "category",
+          "rule_text",
+          "score",
+          "enforcement",
+          "reason"
+        ],
+        "title": "MatchedPolicy"
+      },
+      "PendingApproval": {
+        "properties": {
+          "approval_id": {
+            "type": "string",
+            "title": "Approval Id"
+          },
+          "action_id": {
+            "type": "string",
+            "title": "Action Id"
+          },
+          "agent_id": {
+            "type": "string",
+            "title": "Agent Id"
+          },
+          "agent_role": {
+            "type": "string",
+            "title": "Agent Role"
+          },
+          "tool_name": {
+            "type": "string",
+            "title": "Tool Name"
+          },
+          "parameters": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Parameters"
+          },
+          "risk_level": {
+            "$ref": "#/components/schemas/RiskLevel"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "matched_policies": {
+            "items": {
+              "$ref": "#/components/schemas/MatchedPolicy"
+            },
+            "type": "array",
+            "title": "Matched Policies"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "PENDING | APPROVED | REJECTED",
+            "default": "PENDING"
+          }
+        },
+        "type": "object",
+        "required": [
+          "approval_id",
+          "action_id",
+          "agent_id",
+          "agent_role",
+          "tool_name",
+          "parameters",
+          "risk_level",
+          "reason",
+          "matched_policies",
+          "created_at"
+        ],
+        "title": "PendingApproval"
+      },
+      "Policy": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "category": {
+            "$ref": "#/components/schemas/PolicyCategory"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "rule_text": {
+            "type": "string",
+            "title": "Rule Text"
+          },
+          "enforcement": {
+            "$ref": "#/components/schemas/GuardVerdict"
+          },
+          "risk_level": {
+            "$ref": "#/components/schemas/RiskLevel"
+          },
+          "target_tools": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Target Tools"
+          },
+          "conditions": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conditions"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active",
+            "default": true
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "category",
+          "name",
+          "rule_text",
+          "enforcement",
+          "risk_level",
+          "target_tools",
+          "created_at"
+        ],
+        "title": "Policy"
+      },
+      "PolicyCategory": {
+        "type": "string",
+        "enum": [
+          "financial",
+          "destructive",
+          "pii",
+          "rbac",
+          "compliance"
+        ],
+        "title": "PolicyCategory"
+      },
+      "PolicyCreateRequest": {
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/PolicyCategory"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "rule_text": {
+            "type": "string",
+            "title": "Rule Text"
+          },
+          "enforcement": {
+            "$ref": "#/components/schemas/GuardVerdict",
+            "default": "BLOCK"
+          },
+          "risk_level": {
+            "$ref": "#/components/schemas/RiskLevel",
+            "default": "HIGH"
+          },
+          "target_tools": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Target Tools"
+          },
+          "conditions": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conditions"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "category",
+          "name",
+          "rule_text"
+        ],
+        "title": "PolicyCreateRequest"
+      },
+      "RiskLevel": {
+        "type": "string",
+        "enum": [
+          "LOW",
+          "MEDIUM",
+          "HIGH",
+          "CRITICAL"
+        ],
+        "title": "RiskLevel"
+      },
+      "ScenarioRunRequest": {
+        "properties": {
+          "scenario_id": {
+            "type": "string",
+            "title": "Scenario Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scenario_id"
+        ],
+        "title": "ScenarioRunRequest"
+      },
+      "SimulationScenario": {
+        "properties": {
+          "scenario_id": {
+            "type": "string",
+            "title": "Scenario Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "expected_verdict": {
+            "$ref": "#/components/schemas/GuardVerdict"
+          },
+          "expected_risk": {
+            "$ref": "#/components/schemas/RiskLevel"
+          },
+          "sample_request": {
+            "$ref": "#/components/schemas/ActionEvaluationRequest"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scenario_id",
+          "name",
+          "description",
+          "category",
+          "expected_verdict",
+          "expected_risk",
+          "sample_request"
+        ],
+        "title": "SimulationScenario"
+      },
+      "SystemHealth": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "moss_connected": {
+            "type": "boolean",
+            "title": "Moss Connected"
+          },
+          "active_mode": {
+            "type": "string",
+            "title": "Active Mode"
+          },
+          "total_policies_indexed": {
+            "type": "integer",
+            "title": "Total Policies Indexed"
+          },
+          "total_incidents_indexed": {
+            "type": "integer",
+            "title": "Total Incidents Indexed"
+          },
+          "uptime_seconds": {
+            "type": "number",
+            "title": "Uptime Seconds"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "moss_connected",
+          "active_mode",
+          "total_policies_indexed",
+          "total_incidents_indexed",
+          "uptime_seconds"
+        ],
+        "title": "SystemHealth"
+      },
+      "ToolExecutionResult": {
+        "properties": {
+          "executed": {
+            "type": "boolean",
+            "title": "Executed",
+            "description": "Whether the tool was actually executed"
+          },
+          "tool_name": {
+            "type": "string",
+            "title": "Tool Name",
+            "description": "Name of the executed tool"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "Execution status: success | failed | blocked | pending_approval"
+          },
+          "output": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Output",
+            "description": "Output payload from external API"
+          },
+          "executed_at": {
+            "type": "string",
+            "title": "Executed At",
+            "description": "ISO 8601 timestamp of execution"
+          },
+          "execution_time_ms": {
+            "type": "number",
+            "title": "Execution Time Ms",
+            "description": "External API round-trip execution latency in ms",
+            "default": 0.0
+          }
+        },
+        "type": "object",
+        "required": [
+          "executed",
+          "tool_name",
+          "status",
+          "executed_at"
+        ],
+        "title": "ToolExecutionResult"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}
