@@ -182,3 +182,52 @@ def test_audit_retention_pruning(temp_db):
 
     remaining = appr_mgr.get_audit_logs(limit=20)
     assert len(remaining) == 5
+
+
+def test_resolve_writable_path():
+    """
+    Verifies that a valid writable path is used directly without fallback.
+    """
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        expected_path = os.path.join(tmp_dir, "custom_agentguard.db")
+        resolved = DatabaseManager._resolve_and_prepare_path(expected_path)
+        assert os.path.abspath(resolved) == os.path.abspath(expected_path)
+
+
+def test_resolve_unwritable_path_falls_back_to_ephemeral(monkeypatch):
+    """
+    Verifies that when parent directory is not writable (simulating Render Free plan non-root),
+    DatabaseManager does not raise PermissionError and falls back to ephemeral tempdir storage.
+    """
+    def mock_access(path, mode):
+        # Simulate /var/data or /restricted being not writable
+        if "restricted" in path or "var" in path.lower():
+            return False
+        return True
+
+    monkeypatch.setattr(os, "access", mock_access)
+
+    unwritable_target = "/var/data/agentguard.db"
+    resolved = DatabaseManager._resolve_and_prepare_path(unwritable_target)
+
+    # Must fall back to tempfile location without raising PermissionError
+    expected_fallback = os.path.join(tempfile.gettempdir(), "agentguard.db")
+    assert os.path.abspath(resolved) == os.path.abspath(expected_fallback)
+
+
+def test_approval_manager_unwritable_path_startup_resilience(monkeypatch):
+    """
+    Verifies that ApprovalManager initializes cleanly without raising
+    PermissionError: [Errno 13] Permission denied when given an unwritable path.
+    """
+    def mock_access(path, mode):
+        if "var" in path.lower():
+            return False
+        return True
+
+    monkeypatch.setattr(os, "access", mock_access)
+
+    # Should not raise PermissionError
+    mgr = ApprovalManager(db_path="/var/data/agentguard.db")
+    assert mgr.db_manager.db_path is not None
+    assert "var" not in mgr.db_manager.db_path.lower()

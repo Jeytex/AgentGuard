@@ -149,3 +149,30 @@ def test_system_backup_and_prune_api(client):
     assert prune_data["status"] == "success"
     assert "deleted_records" in prune_data
 
+
+def test_render_free_plan_startup_resilience(monkeypatch):
+    """
+    Verifies that when deployed to an unprivileged container on Render Free plan
+    (where /var/data cannot be created), the backend handles requests and health checks cleanly.
+    """
+    import os
+    from fastapi.testclient import TestClient
+    from app.main import app
+    from app.db.connection import DatabaseManager
+
+    def mock_access(path, mode):
+        if "var" in path.lower():
+            return False
+        return True
+
+    monkeypatch.setattr(os, "access", mock_access)
+
+    # Re-initialize with unwritable target path
+    db_mgr = DatabaseManager(db_path="/var/data/agentguard.db")
+    assert "var" not in db_mgr.db_path.lower()
+
+    tc = TestClient(app)
+    health_res = tc.get("/health/ready")
+    assert health_res.status_code == 200
+    assert health_res.json()["status"] == "ready"
+

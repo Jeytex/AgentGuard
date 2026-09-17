@@ -230,6 +230,42 @@ The frontend console starts at `http://localhost:3000`.
 
 ---
 
+### Option C: Cloud Deployment (Render & Vercel)
+
+#### Backend Deployment on Render
+
+AgentGuard's backend is packaged with a security-hardened Dockerfile executing as an unprivileged user (`agentguard:1000`).
+
+1. **Create Web Service on Render:**
+   - Connect repository `AgentGuard`.
+   - **Root Directory:** leave blank (repository root) or `backend`.
+   - **Runtime:** `Docker` (Render will build `backend/Dockerfile` or root).
+2. **Configure Environment Variables:**
+   - `MOSS_PROJECT_ID`: your Moss Project ID.
+   - `MOSS_PROJECT_KEY`: your Moss Project API key.
+   - `MOSS_MOCK_FALLBACK`: `false` (or `true` if evaluating without live credentials).
+   - `ENVIRONMENT`: `production`
+   - `DEBUG`: `false`
+   - `CORS_ORIGINS`: `https://<your-app>.vercel.app` (or comma-separated list).
+3. **Database Storage Configuration (`SQLITE_DB_PATH`):**
+   - **Render Free Tier (Ephemeral Storage):**
+     - Set `SQLITE_DB_PATH=/tmp/agentguard.db`.
+     - *Why:* Render Free instances run without persistent disk mounts. `/tmp` is guaranteed writable by unprivileged container users. Even if `/var/data/agentguard.db` is accidentally specified, AgentGuard automatically detects the uncreatable parent directory and safely falls back to `/tmp/agentguard.db` without crashing.
+   - **Render Paid Tier (Persistent Storage):**
+     - Add a persistent disk in Render service settings mounted at `/var/data` (e.g. 1GB disk).
+     - Set `SQLITE_DB_PATH=/var/data/agentguard.db`.
+
+#### Frontend Deployment on Vercel
+
+1. Import repository `AgentGuard` into Vercel.
+2. Set **Root Directory** to `UI`.
+3. Framework Preset: **Next.js**.
+4. Configure Environment Variables:
+   - `NEXT_PUBLIC_AGENTGUARD_API_URL`: `https://<your-render-backend>.onrender.com/api/v1`
+   - `NEXT_PUBLIC_AGENTGUARD_WS_URL`: `wss://<your-render-backend>.onrender.com/api/v1/events/ws`
+
+---
+
 ## 6. Configuration & Secrets Management
 
 AgentGuard uses `pydantic-settings` to provide strongly-typed configuration, validation on startup, and dynamic secret resolution.
@@ -245,7 +281,7 @@ AgentGuard uses `pydantic-settings` to provide strongly-typed configuration, val
 | `HOST` | string | `0.0.0.0` | API bind address |
 | `PORT` | integer | `8000` | API port |
 | `CORS_ORIGINS` | string | `*` | Allowed CORS origins (comma-separated or `*`) |
-| `SQLITE_DB_PATH` | string | `agentguard.db` | Path to persistent SQLite database |
+| `SQLITE_DB_PATH` | string | `agentguard.db` | Path to SQLite DB (`/tmp/agentguard.db` on Render Free ephemeral; `/var/data/agentguard.db` on persistent disk) |
 | `GEMINI_API_KEY` | string | `""` | Optional LLM arbiter API key |
 | `VAULT_ADDR` | string | `""` | HashiCorp Vault URL (if `SECRET_PROVIDER=vault`) |
 | `VAULT_TOKEN` | string | `""` | HashiCorp Vault authentication token |
