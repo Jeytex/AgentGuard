@@ -168,7 +168,13 @@ async def seed_policies_endpoint():
     guard = get_guard_engine()
 
     formatted_docs = format_policies_for_moss()
-    await provider.create_index(settings.POLICY_INDEX_NAME, formatted_docs)
+    try:
+        await provider.create_index(settings.POLICY_INDEX_NAME, formatted_docs)
+    except Exception as e:
+        if "INDEX_EXISTS" in str(e) or "already exists" in str(e):
+            await provider.load_index(settings.POLICY_INDEX_NAME)
+        else:
+            raise e
 
     for pol in get_seed_policies():
         guard.register_policy(pol)
@@ -206,13 +212,21 @@ async def decide_approval(
     body: ApprovalDecisionRequest = ...,
 ):
     approvals_mgr = get_approval_manager()
+    existing = approvals_mgr.get_approval_by_id(approval_id)
+    if not existing:
+        raise HTTPException(status_code=404, detail="Approval request not found.")
+    if existing.status in ("APPROVED", "REJECTED"):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Approval request '{approval_id}' has already been resolved as {existing.status}.",
+        )
+
     result = await approvals_mgr.decide_approval(
         approval_id=approval_id,
         decision=body.decision,
         reviewed_by=body.reviewed_by,
         reviewer_notes=body.reviewer_notes,
     )
-
 
     if not result:
         raise HTTPException(status_code=404, detail="Approval request not found.")

@@ -1,0 +1,4 @@
+@import "tailwindcss";
+:root{--bg:#080a0c;--panel:#0e1115;--panel2:#12161b;--line:#20262e;--muted:#8994a3;--text:#f4f7fa;--cyan:#56d8e4;--green:#62d99a;--red:#ff6d7a;--amber:#e7b96b}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif} button{font:inherit} ::selection{background:#56d8e433}
+.scrollbar::-webkit-scrollbar{width:6px}.scrollbar::-webkit-scrollbar-thumb{background:#27313b;border-radius:10px}.grid-bg{background-image:linear-gradient(#ffffff03 1px,transparent 1px),linear-gradient(90deg,#ffffff03 1px,transparent 1px);background-size:32px 32px}

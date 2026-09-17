@@ -22,11 +22,18 @@ class Settings:
     # Server Settings
     HOST: str = os.getenv("HOST", "0.0.0.0")
     PORT: int = int(os.getenv("PORT", "8000"))
-    CORS_ORIGINS: List[str] = ["*"]
+    CORS_ORIGINS: List[str] = [
+        origin.strip()
+        for origin in os.getenv("CORS_ORIGINS", "*").split(",")
+        if origin.strip()
+    ]
 
     # SQLite Database Path
-    SQLITE_DB_PATH: str = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "agentguard.db"
+    SQLITE_DB_PATH: str = os.getenv(
+        "SQLITE_DB_PATH",
+        os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "agentguard.db"
+        ),
     )
 
     # Moss Indexes

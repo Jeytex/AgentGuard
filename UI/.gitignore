@@ -12,7 +12,18 @@ venv/
 .venv/
 .pytest_cache/
 *.db
-*.db-*
-*.sqlite
 *.sqlite3
-*.sqlite3-*
+
+# Node / Frontend
+node_modules/
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+.npm
+.pnpm-store
+
+# OS files
+.DS_Store
+Thumbs.db
