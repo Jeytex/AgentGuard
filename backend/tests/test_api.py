@@ -115,3 +115,37 @@ def test_hitl_approval_lifecycle(client):
     post_pending = post_list_res.json()
     assert not any(p["approval_id"] == appr_id for p in post_pending)
 
+
+def test_container_health_probes(client):
+    # Root /health for Docker & AWS ECS / GCP Cloud Run probes
+    res = client.get("/health")
+    assert res.status_code == 200
+    assert res.json()["status"] == "healthy"
+
+    # Kubernetes liveness probe
+    live_res = client.get("/health/live")
+    assert live_res.status_code == 200
+    assert live_res.json()["status"] == "alive"
+
+    # Kubernetes readiness probe
+    ready_res = client.get("/health/ready")
+    assert ready_res.status_code == 200
+    assert ready_res.json()["status"] == "ready"
+    assert ready_res.json()["database"] == "connected"
+
+
+def test_system_backup_and_prune_api(client):
+    # Test backup endpoint
+    backup_res = client.post("/api/v1/system/backup")
+    assert backup_res.status_code == 200
+    backup_data = backup_res.json()
+    assert backup_data["status"] == "success"
+    assert "backup_path" in backup_data
+
+    # Test prune endpoint
+    prune_res = client.post("/api/v1/system/prune", json={"days_to_keep": 30, "max_records": 1000})
+    assert prune_res.status_code == 200
+    prune_data = prune_res.json()
+    assert prune_data["status"] == "success"
+    assert "deleted_records" in prune_data
+

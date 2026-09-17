@@ -18,6 +18,7 @@ import { useAgentGuardWebSocket } from './hooks/useAgentGuardWebSocket';
 import { Header } from './components/Header';
 import { Sidebar, ViewType } from './components/Sidebar';
 import { ToastContainer, ToastMessage } from './components/common/Toast';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { ActionDetailDrawer } from './components/modals/ActionDetailDrawer';
 import { CreatePolicyModal } from './components/modals/CreatePolicyModal';
 import { OverviewView } from './components/views/OverviewView';
@@ -379,74 +380,76 @@ export default function App() {
               )}
             </div>
 
-            {/* View Render */}
-            {view === 'Overview' && (
-              <OverviewView
-                health={health}
-                interceptions={interceptions}
-                pendingCount={pendingApprovals.length}
-                benchmarkResult={benchmarkResult}
-                onOpenItem={setSelectedItem}
-                onNavigate={setView}
-              />
-            )}
+            {/* View Render with Production Error Boundary */}
+            <ErrorBoundary fallbackTitle="AgentGuard Console Error">
+              {view === 'Overview' && (
+                <OverviewView
+                  health={health}
+                  interceptions={interceptions}
+                  pendingCount={pendingApprovals.length}
+                  benchmarkResult={benchmarkResult}
+                  onOpenItem={setSelectedItem}
+                  onNavigate={setView}
+                />
+              )}
 
-            {view === 'Interceptions' && (
-              <InterceptionsView
-                interceptions={interceptions}
-                loading={loading}
-                onOpenItem={setSelectedItem}
-              />
-            )}
+              {view === 'Interceptions' && (
+                <InterceptionsView
+                  interceptions={interceptions}
+                  loading={loading}
+                  onOpenItem={setSelectedItem}
+                />
+              )}
 
-            {view === 'Approvals' && (
-              <ApprovalsView
-                approvals={pendingApprovals}
-                loading={loading}
-                onOpenItem={setSelectedItem}
-                onDecide={handleDecideApproval}
-              />
-            )}
+              {view === 'Approvals' && (
+                <ApprovalsView
+                  approvals={pendingApprovals}
+                  loading={loading}
+                  onOpenItem={setSelectedItem}
+                  onDecide={handleDecideApproval}
+                />
+              )}
 
-            {view === 'Policies' && (
-              <PoliciesView
-                policies={policies}
-                loading={loading}
-                onOpenCreate={() => setCreatePolicyOpen(true)}
-                onSeedPolicies={handleSeedPolicies}
-                seeding={seeding}
-              />
-            )}
+              {view === 'Policies' && (
+                <PoliciesView
+                  policies={policies}
+                  loading={loading}
+                  onOpenCreate={() => setCreatePolicyOpen(true)}
+                  onSeedPolicies={handleSeedPolicies}
+                  seeding={seeding}
+                />
+              )}
 
-            {view === 'Agents' && (
-              <AgentsView agents={agents} loading={loading} />
-            )}
+              {view === 'Agents' && (
+                <AgentsView agents={agents} loading={loading} />
+              )}
 
-            {view === 'Benchmarks' && (
-              <BenchmarksView
-                benchmarkResult={benchmarkResult}
-                onRunBenchmark={handleRunBenchmark}
-                running={runningBenchmark}
-              />
-            )}
+              {view === 'Benchmarks' && (
+                <BenchmarksView
+                  benchmarkResult={benchmarkResult}
+                  onRunBenchmark={handleRunBenchmark}
+                  running={runningBenchmark}
+                />
+              )}
 
-            {view === 'Simulator' && (
-              <SimulatorView
-                scenarios={scenarios}
-                loading={loading}
-                onRunScenario={handleRunScenario}
-                onCustomEvaluate={handleCustomEvaluate}
-                onNavigate={setView}
-              />
-            )}
+              {view === 'Simulator' && (
+                <SimulatorView
+                  scenarios={scenarios}
+                  loading={loading}
+                  onRunScenario={handleRunScenario}
+                  onCustomEvaluate={handleCustomEvaluate}
+                  onNavigate={setView}
+                />
+              )}
 
-            {view === 'Audit / Incidents' && (
-              <AuditView
-                interceptions={interceptions}
-                loading={loading}
-                onOpenItem={setSelectedItem}
-              />
-            )}
+              {view === 'Audit / Incidents' && (
+                <AuditView
+                  interceptions={interceptions}
+                  loading={loading}
+                  onOpenItem={setSelectedItem}
+                />
+              )}
+            </ErrorBoundary>
           </div>
         </main>
       </div>

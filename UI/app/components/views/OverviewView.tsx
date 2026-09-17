@@ -55,9 +55,11 @@ export function OverviewView({
     <div className="space-y-6">
       {/* Metric Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div
+        <button
+          type="button"
           onClick={() => onNavigate('Interceptions')}
-          className="cursor-pointer"
+          aria-label="View all interceptions and audit decisions"
+          className="w-full text-left rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--cyan)]/40"
         >
           <Card className="p-5 transition hover:border-[var(--cyan)]/40 hover:bg-white/[0.02]">
             <div className="flex items-start justify-between">
@@ -71,11 +73,13 @@ export function OverviewView({
               </div>
             </div>
           </Card>
-        </div>
+        </button>
 
-        <div
+        <button
+          type="button"
           onClick={() => onNavigate('Interceptions')}
-          className="cursor-pointer"
+          aria-label="View allow rate details in interceptions"
+          className="w-full text-left rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--green)]/40"
         >
           <Card className="p-5 transition hover:border-[var(--green)]/40 hover:bg-white/[0.02]">
             <div className="flex items-start justify-between">
@@ -91,11 +95,13 @@ export function OverviewView({
               </div>
             </div>
           </Card>
-        </div>
+        </button>
 
-        <div
+        <button
+          type="button"
           onClick={() => onNavigate('Benchmarks')}
-          className="cursor-pointer"
+          aria-label="View telemetry and P95 latency benchmarks"
+          className="w-full text-left rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400/40"
         >
           <Card className="p-5 transition hover:border-purple-400/40 hover:bg-white/[0.02]">
             <div className="flex items-start justify-between">
@@ -111,11 +117,13 @@ export function OverviewView({
               </div>
             </div>
           </Card>
-        </div>
+        </button>
 
-        <div
+        <button
+          type="button"
           onClick={() => onNavigate('Policies')}
-          className="cursor-pointer"
+          aria-label="View active security policies indexed in Moss"
+          className="w-full text-left rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--cyan)]/40"
         >
           <Card className="p-5 transition hover:border-[var(--cyan)]/40 hover:bg-white/[0.02]">
             <div className="flex items-start justify-between">
@@ -133,7 +141,7 @@ export function OverviewView({
               </div>
             </div>
           </Card>
-        </div>
+        </button>
       </div>
 
       {/* Main Grid: Activity Stream & Decision Distribution */}

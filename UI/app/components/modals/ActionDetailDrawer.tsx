@@ -116,6 +116,9 @@ export function ActionDetailDrawer({ item, onClose, onDecide }: ActionDetailDraw
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm" onClick={onClose}>
       <aside
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="action-detail-title"
         onClick={(e) => e.stopPropagation()}
         className="scrollbar flex h-full w-full max-w-2xl flex-col border-l border-[var(--line)] bg-[#0b0e12] p-6 shadow-2xl overflow-y-auto"
       >
@@ -125,7 +128,7 @@ export function ActionDetailDrawer({ item, onClose, onDecide }: ActionDetailDraw
             <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.2em] text-[var(--muted)]">
               <ShieldAlert className="size-3 text-[var(--cyan)]" /> Action Inspection
             </div>
-            <h2 className="mt-1.5 truncate text-xl font-semibold text-white">{toolName}</h2>
+            <h2 id="action-detail-title" className="mt-1.5 truncate text-xl font-semibold text-white">{toolName}</h2>
             <div className="mt-1 flex flex-wrap items-center gap-2 font-mono text-xs text-[var(--muted)]">
               <span>{actionId}</span>
               <span>•</span>
@@ -135,6 +138,7 @@ export function ActionDetailDrawer({ item, onClose, onDecide }: ActionDetailDraw
           </div>
           <button
             onClick={onClose}
+            aria-label="Close inspection drawer"
             className="rounded-lg p-2 text-[var(--muted)] transition hover:bg-white/5 hover:text-white"
           >
             <X className="size-5" />

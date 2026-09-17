@@ -1,5 +1,4 @@
 import pytest
-import asyncio
 from app.retrieval.mock_client import MockRetrievalProvider
 from app.data.seed_policies import format_policies_for_moss
 

@@ -139,7 +139,7 @@ class GuardEngine:
         retrieval_query = (
             f"{request.tool_name} role:{request.agent_role} {params_str[:150]} {request.context or ''}"
         )
-        
+
         moss_res = await self.provider.query(
             settings.POLICY_INDEX_NAME,
             retrieval_query,
@@ -254,7 +254,6 @@ class GuardEngine:
 
             if violation_found:
                 enforcement = pol_def["enforcement"]
-                rule_risk = pol_def["risk_level"]
 
                 matched_policies.append(
                     MatchedPolicy(

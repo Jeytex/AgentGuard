@@ -1,4 +1,4 @@
-from typing import List, Dict, Any
+from typing import List
 from app.engine.models import SimulationScenario, ActionEvaluationRequest, GuardVerdict, RiskLevel
 
 PRESET_SCENARIOS: List[SimulationScenario] = [

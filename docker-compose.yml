@@ -1,0 +1,63 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: agentguard-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - CORS_ORIGINS=*
+      - SQLITE_DB_PATH=/app/data/agentguard.db
+      - SECRET_PROVIDER=${SECRET_PROVIDER:-env}
+      - MOSS_MOCK_FALLBACK=${MOSS_MOCK_FALLBACK:-true}
+      - MOSS_PROJECT_ID=${MOSS_PROJECT_ID:-}
+      - MOSS_PROJECT_KEY=${MOSS_PROJECT_KEY:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - VAULT_ADDR=${VAULT_ADDR:-}
+      - VAULT_TOKEN=${VAULT_TOKEN:-}
+      - VAULT_PATH=${VAULT_PATH:-secret/data/agentguard}
+    volumes:
+      - agentguard-data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - agentguard-network
+
+  frontend:
+    build:
+      context: ./UI
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_AGENTGUARD_API_URL: ${NEXT_PUBLIC_AGENTGUARD_API_URL:-http://localhost:8000/api/v1}
+        NEXT_PUBLIC_AGENTGUARD_WS_URL: ${NEXT_PUBLIC_AGENTGUARD_WS_URL:-ws://localhost:8000/api/v1/events/ws}
+    container_name: agentguard-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_AGENTGUARD_API_URL=${NEXT_PUBLIC_AGENTGUARD_API_URL:-http://localhost:8000/api/v1}
+      - NEXT_PUBLIC_AGENTGUARD_WS_URL=${NEXT_PUBLIC_AGENTGUARD_WS_URL:-ws://localhost:8000/api/v1/events/ws}
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - agentguard-network
+
+volumes:
+  agentguard-data:
+    driver: local
+
+networks:
+  agentguard-network:
+    driver: bridge

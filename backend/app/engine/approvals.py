@@ -1,74 +1,36 @@
 import uuid
-import time
 import json
-import sqlite3
 import logging
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone
+
 from app.config import settings
-from app.engine.models import PendingApproval, ApprovalDecisionResponse, MatchedPolicy, RiskLevel
+from app.db import DatabaseManager, apply_migrations
+from app.engine.models import (
+    PendingApproval,
+    ApprovalDecisionResponse,
+    MatchedPolicy,
+    RiskLevel,
+)
 
 logger = logging.getLogger("agentguard.approvals")
 
 
 class ApprovalManager:
     """
-    Thread-safe embedded SQLite store for Human-in-the-Loop approvals and audit trails.
+    Production thread-safe SQLite store for Human-in-the-Loop approvals and audit trails.
+    Uses DatabaseManager with WAL mode, busy timeouts, automated migrations, and idempotency guards.
     """
 
     def __init__(self, db_path: Optional[str] = None):
-        self.db_path = db_path or settings.SQLITE_DB_PATH
+        self.db_manager = DatabaseManager(db_path or settings.SQLITE_DB_PATH)
         self._init_db()
 
-    def _get_connection(self) -> sqlite3.Connection:
-        conn = sqlite3.connect(self.db_path)
-        conn.row_factory = sqlite3.Row
-        # Enable WAL mode for high concurrency
-        conn.execute("PRAGMA journal_mode=WAL;")
-        return conn
-
     def _init_db(self) -> None:
-        with self._get_connection() as conn:
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS approvals (
-                    approval_id TEXT PRIMARY KEY,
-                    action_id TEXT NOT NULL,
-                    agent_id TEXT NOT NULL,
-                    agent_role TEXT NOT NULL,
-                    tool_name TEXT NOT NULL,
-                    parameters TEXT NOT NULL,
-                    risk_level TEXT NOT NULL,
-                    reason TEXT NOT NULL,
-                    matched_policies TEXT NOT NULL,
-                    status TEXT NOT NULL,
-                    created_at TEXT NOT NULL,
-                    resolved_at TEXT,
-                    resolved_by TEXT,
-                    reviewer_notes TEXT
-                );
-            """)
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS audit_logs (
-                    action_id TEXT PRIMARY KEY,
-                    agent_id TEXT NOT NULL,
-                    agent_role TEXT NOT NULL,
-                    tool_name TEXT NOT NULL,
-                    parameters TEXT NOT NULL,
-                    verdict TEXT NOT NULL,
-                    risk_level TEXT NOT NULL,
-                    risk_score INTEGER NOT NULL,
-                    reason TEXT NOT NULL,
-                    moss_retrieval_ms REAL NOT NULL,
-                    total_latency_ms REAL NOT NULL,
-                    timestamp TEXT NOT NULL,
-                    execution_result TEXT
-                );
-            """)
-            try:
-                conn.execute("ALTER TABLE audit_logs ADD COLUMN execution_result TEXT;")
-            except Exception:
-                pass
-            conn.commit()
+        """
+        Run versioned migrations and ensure performance indexes exist.
+        """
+        apply_migrations(self.db_manager)
 
     def create_approval(
         self,
@@ -84,7 +46,7 @@ class ApprovalManager:
         approval_id = f"appr_{uuid.uuid4()}"
         created_at = datetime.now(timezone.utc).isoformat()
 
-        with self._get_connection() as conn:
+        with self.db_manager.get_connection() as conn:
             conn.execute(
                 """
                 INSERT INTO approvals (
@@ -106,7 +68,6 @@ class ApprovalManager:
                     created_at,
                 ),
             )
-            conn.commit()
 
         return PendingApproval(
             approval_id=approval_id,
@@ -123,9 +84,9 @@ class ApprovalManager:
         )
 
     def get_pending_approvals(self) -> List[PendingApproval]:
-        with self._get_connection() as conn:
+        with self.db_manager.get_read_connection() as conn:
             cursor = conn.execute(
-                "SELECT * FROM approvals WHERE status = 'PENDING' ORDER BY created_at DESC"
+                "SELECT * FROM approvals WHERE status = 'PENDING' ORDER BY created_at DESC;"
             )
             rows = cursor.fetchall()
 
@@ -140,7 +101,7 @@ class ApprovalManager:
                     agent_id=row["agent_id"],
                     agent_role=row["agent_role"],
                     tool_name=row["tool_name"],
-                    parameters=json.loads(row["parameters"]),
+                    parameters=json.loads(row["parameters"]) if row["parameters"] else {},
                     risk_level=RiskLevel(row["risk_level"]),
                     reason=row["reason"],
                     matched_policies=policies,
@@ -151,9 +112,9 @@ class ApprovalManager:
         return results
 
     def get_approval_by_id(self, approval_id: str) -> Optional[PendingApproval]:
-        with self._get_connection() as conn:
+        with self.db_manager.get_read_connection() as conn:
             cursor = conn.execute(
-                "SELECT * FROM approvals WHERE approval_id = ?", (approval_id,)
+                "SELECT * FROM approvals WHERE approval_id = ?;", (approval_id,)
             )
             row = cursor.fetchone()
 
@@ -168,7 +129,7 @@ class ApprovalManager:
             agent_id=row["agent_id"],
             agent_role=row["agent_role"],
             tool_name=row["tool_name"],
-            parameters=json.loads(row["parameters"]),
+            parameters=json.loads(row["parameters"]) if row["parameters"] else {},
             risk_level=RiskLevel(row["risk_level"]),
             reason=row["reason"],
             matched_policies=policies,
@@ -183,17 +144,25 @@ class ApprovalManager:
         reviewed_by: str,
         reviewer_notes: Optional[str] = None,
     ) -> Optional[ApprovalDecisionResponse]:
+        """
+        Atomically resolves a pending approval.
+        Guarantees strict idempotency and race-condition safety via atomic conditional UPDATE:
+        Only the first concurrent request to transition from 'PENDING' succeeds.
+        """
         status = "APPROVED" if decision == "APPROVE" else "REJECTED"
         resolved_at = datetime.now(timezone.utc).isoformat()
 
-        with self._get_connection() as conn:
+        with self.db_manager.get_connection() as conn:
+            # 1. Fetch current approval details
             cursor = conn.execute(
-                "SELECT action_id, tool_name, parameters, risk_level, agent_id, agent_role FROM approvals WHERE approval_id = ?",
+                "SELECT action_id, tool_name, parameters, risk_level, agent_id, agent_role, status FROM approvals WHERE approval_id = ?;",
                 (approval_id,),
             )
             row = cursor.fetchone()
             if not row:
+                logger.warning("Approval decision failed: %s not found", approval_id)
                 return None
+
             action_id = row["action_id"]
             tool_name = row["tool_name"]
             parameters = json.loads(row["parameters"]) if row["parameters"] else {}
@@ -201,24 +170,32 @@ class ApprovalManager:
             agent_id = row["agent_id"]
             agent_role = row["agent_role"]
 
-            conn.execute(
+            # 2. Atomic conditional update: guarantees only PENDING approvals can be decided
+            update_cursor = conn.execute(
                 """
-                UPDATE approvals 
+                UPDATE approvals
                 SET status = ?, resolved_at = ?, resolved_by = ?, reviewer_notes = ?
-                WHERE approval_id = ?
+                WHERE approval_id = ? AND status = 'PENDING';
                 """,
                 (status, resolved_at, reviewed_by, reviewer_notes, approval_id),
             )
-            conn.commit()
 
-        # Execute approved action via ToolExecutor
+            if update_cursor.rowcount == 0:
+                logger.warning(
+                    "Approval %s was already decided by a concurrent transaction (current: %s)",
+                    approval_id,
+                    row["status"],
+                )
+                return None
+
+        # 3. Execute approved action via ToolExecutor ONLY if the atomic update succeeded
         execution_result = None
         if status == "APPROVED":
             from app.engine.executor import get_tool_executor
             executor = get_tool_executor()
             execution_result = await executor.execute(tool_name, parameters)
 
-            # Record / update audit log with ALLOW verdict and execution result
+            # Record audit log with ALLOW verdict and tool output
             self.record_audit(
                 action_id=action_id,
                 agent_id=agent_id,
@@ -285,14 +262,14 @@ class ApprovalManager:
         execution_result: Optional[Dict[str, Any]] = None,
     ) -> None:
         timestamp = datetime.now(timezone.utc).isoformat()
-        with self._get_connection() as conn:
+        with self.db_manager.get_connection() as conn:
             conn.execute(
                 """
                 INSERT OR REPLACE INTO audit_logs (
                     action_id, agent_id, agent_role, tool_name, parameters,
                     verdict, risk_level, risk_score, reason,
                     moss_retrieval_ms, total_latency_ms, timestamp, execution_result
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
                 """,
                 (
                     action_id,
@@ -310,13 +287,35 @@ class ApprovalManager:
                     json.dumps(execution_result) if execution_result else None,
                 ),
             )
-            conn.commit()
 
-    def get_audit_logs(self, limit: int = 50) -> List[Dict[str, Any]]:
-        with self._get_connection() as conn:
-            cursor = conn.execute(
-                "SELECT * FROM audit_logs ORDER BY timestamp DESC LIMIT ?", (limit,)
-            )
+    def get_audit_logs(
+        self,
+        limit: int = 50,
+        verdict: Optional[str] = None,
+        agent_id: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
+        """
+        Indexed fast-path query for audit logs with optional verdict & agent filtering.
+        """
+        query = "SELECT * FROM audit_logs"
+        params: List[Any] = []
+        conditions: List[str] = []
+
+        if verdict:
+            conditions.append("verdict = ?")
+            params.append(verdict.upper())
+        if agent_id:
+            conditions.append("agent_id = ?")
+            params.append(agent_id)
+
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
+
+        query += " ORDER BY timestamp DESC LIMIT ?;"
+        params.append(limit)
+
+        with self.db_manager.get_read_connection() as conn:
+            cursor = conn.execute(query, params)
             rows = cursor.fetchall()
 
         results = []
@@ -348,6 +347,11 @@ class ApprovalManager:
             })
         return results
 
+    def backup_database(self, target_path: str) -> bool:
+        return self.db_manager.backup_database(target_path)
+
+    def prune_audit_logs(self, days_to_keep: int = 90, max_records: int = 50000) -> int:
+        return self.db_manager.prune_audit_logs(days_to_keep=days_to_keep, max_records=max_records)
 
 
 _approval_manager: Optional[ApprovalManager] = None

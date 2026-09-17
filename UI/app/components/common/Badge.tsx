@@ -7,7 +7,7 @@ interface BadgeProps {
   size?: 'sm' | 'md';
 }
 
-export function Badge({ children, kind = 'ALLOW', size = 'sm' }: BadgeProps) {
+export const Badge = React.memo(function Badge({ children, kind = 'ALLOW', size = 'sm' }: BadgeProps) {
   const upper = String(kind).toUpperCase();
   let color = '#62d99a'; // green
   let label = children || upper;
@@ -23,7 +23,6 @@ export function Badge({ children, kind = 'ALLOW', size = 'sm' }: BadgeProps) {
   }
 
   const text = String(label).replace('REQUIRE_APPROVAL', 'HUMAN APPROVAL');
-
   const paddingClass = size === 'md' ? 'px-2.5 py-1 text-xs' : 'px-2 py-0.5 text-[10px]';
 
   return (
@@ -38,9 +37,9 @@ export function Badge({ children, kind = 'ALLOW', size = 'sm' }: BadgeProps) {
       {text}
     </span>
   );
-}
+});
 
-export function RiskScoreBadge({ score }: { score: number }) {
+export const RiskScoreBadge = React.memo(function RiskScoreBadge({ score }: { score: number }) {
   let color = '#62d99a';
   if (score >= 80) color = '#ff6d7a';
   else if (score >= 40) color = '#e7b96b';
@@ -53,4 +52,4 @@ export function RiskScoreBadge({ score }: { score: number }) {
       {score}/100
     </span>
   );
-}
+});

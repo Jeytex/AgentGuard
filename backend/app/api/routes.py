@@ -459,5 +459,48 @@ async def websocket_event_feed(websocket: WebSocket):
                 await websocket.send_text('{"event_type": "PONG"}')
     except WebSocketDisconnect:
         ws_manager.disconnect(websocket)
-    except Exception as e:
+    except Exception:
         ws_manager.disconnect(websocket)
+
+
+# ==============================================================================
+# 10. Database Maintenance & Backup
+# ==============================================================================
+
+class BackupRequest(BaseModel):
+    target_path: Optional[str] = None
+
+
+class PruneRequest(BaseModel):
+    days_to_keep: int = 90
+    max_records: int = 50000
+
+
+@router.post("/system/backup", summary="Trigger zero-downtime hot database backup")
+async def trigger_database_backup(body: Optional[BackupRequest] = None):
+    appr_mgr = get_approval_manager()
+    target = (body.target_path if body and body.target_path else None) or f"{settings.SQLITE_DB_PATH}.bak"
+    success = appr_mgr.backup_database(target)
+    if not success:
+        raise HTTPException(status_code=500, detail="Database backup failed")
+    return {
+        "status": "success",
+        "backup_path": target,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+@router.post("/system/prune", summary="Prune expired audit logs per retention policy")
+async def prune_audit_logs_endpoint(body: Optional[PruneRequest] = None):
+    appr_mgr = get_approval_manager()
+    days = body.days_to_keep if body else 90
+    max_rec = body.max_records if body else 50000
+    deleted = appr_mgr.prune_audit_logs(days_to_keep=days, max_records=max_rec)
+    return {
+        "status": "success",
+        "deleted_records": deleted,
+        "days_to_keep": days,
+        "max_records": max_rec,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+

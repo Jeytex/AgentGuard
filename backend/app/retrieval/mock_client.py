@@ -1,5 +1,4 @@
 import time
-import math
 import re
 import logging
 from typing import List, Dict, Any, Optional
@@ -74,7 +73,7 @@ class MockRetrievalProvider(RetrievalProvider):
             # Hybrid scoring: token overlap + length normalization + keyword match
             doc_tokens = _tokenize(doc.get("text", ""))
             doc_token_set = set(doc_tokens)
-            
+
             if not query_tokens or not doc_tokens:
                 score = 0.0
             else:

@@ -1,0 +1,29 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+.pytest_cache/
+tests/
+
+# Secrets and environment files
+.env
+.env.*
+*.env
+
+# Local database files
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.sqlite3-*
+
+# Git & CI/CD
+.git/
+.gitignore
+.github/
+
+# OS artifacts
+.DS_Store
+Thumbs.db

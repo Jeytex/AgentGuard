@@ -1,0 +1,22 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+.npm
+.pnpm-store
+
+# Environment files
+.env
+.env.*
+*.env
+
+# Git & repository artifacts
+.git/
+.gitignore
+.github/
+
+# OS artifacts
+.DS_Store
+Thumbs.db

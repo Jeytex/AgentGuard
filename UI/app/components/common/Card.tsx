@@ -1,6 +1,6 @@
 import React from 'react';
 
-export function Card({
+export const Card = React.memo(function Card({
   children,
   className = '',
 }: {
@@ -14,4 +14,4 @@ export function Card({
       {children}
     </section>
   );
-}
+});

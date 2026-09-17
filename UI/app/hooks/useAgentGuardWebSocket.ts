@@ -40,6 +40,8 @@ export function useAgentGuardWebSocket({
   const [reconnectAttempt, setReconnectAttempt] = useState(0);
   const [nextRetrySeconds, setNextRetrySeconds] = useState(0);
 
+  const isMountedRef = useRef(true);
+  const intentionalCloseRef = useRef(false);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
   const countdownTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -64,19 +66,29 @@ export function useAgentGuardWebSocket({
   }, [onFallbackPoll]);
 
   const clearAllTimers = useCallback(() => {
-    if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
-    if (countdownTimerRef.current) clearInterval(countdownTimerRef.current);
-    if (pingIntervalRef.current) clearInterval(pingIntervalRef.current);
+    if (reconnectTimerRef.current) {
+      clearTimeout(reconnectTimerRef.current);
+      reconnectTimerRef.current = null;
+    }
+    if (countdownTimerRef.current) {
+      clearInterval(countdownTimerRef.current);
+      countdownTimerRef.current = null;
+    }
+    if (pingIntervalRef.current) {
+      clearInterval(pingIntervalRef.current);
+      pingIntervalRef.current = null;
+    }
   }, []);
 
   const connect = useCallback(() => {
-    if (!enabled) return;
+    if (!enabled || !isMountedRef.current) return;
 
     clearAllTimers();
 
     // Close any previous socket cleanly
     if (wsRef.current) {
       try {
+        intentionalCloseRef.current = true;
         wsRef.current.onopen = null;
         wsRef.current.onmessage = null;
         wsRef.current.onclose = null;
@@ -88,13 +100,20 @@ export function useAgentGuardWebSocket({
       wsRef.current = null;
     }
 
-    setStatus((prev) => (prev === 'connected' ? 'connecting' : 'reconnecting'));
+    intentionalCloseRef.current = false;
+    if (isMountedRef.current) {
+      setStatus((prev) => (prev === 'connected' ? 'connecting' : 'reconnecting'));
+    }
 
     try {
       const socket = new WebSocket(wsUrl);
       wsRef.current = socket;
 
       socket.onopen = () => {
+        if (!isMountedRef.current) {
+          socket.close();
+          return;
+        }
         setStatus('connected');
         setReconnectAttempt(0);
         setNextRetrySeconds(0);
@@ -113,6 +132,7 @@ export function useAgentGuardWebSocket({
       };
 
       socket.onmessage = (event) => {
+        if (!isMountedRef.current) return;
         try {
           const raw = JSON.parse(event.data) as WsServerMessage;
 
@@ -132,10 +152,12 @@ export function useAgentGuardWebSocket({
       };
 
       socket.onclose = () => {
+        if (!isMountedRef.current || intentionalCloseRef.current) return;
         scheduleReconnect();
       };
 
       socket.onerror = () => {
+        if (!isMountedRef.current || intentionalCloseRef.current) return;
         try {
           socket.close();
         } catch {
@@ -143,11 +165,14 @@ export function useAgentGuardWebSocket({
         }
       };
     } catch {
-      scheduleReconnect();
+      if (isMountedRef.current) {
+        scheduleReconnect();
+      }
     }
   }, [enabled, wsUrl, clearAllTimers]);
 
   const scheduleReconnect = useCallback(() => {
+    if (!isMountedRef.current) return;
     clearAllTimers();
     setStatus('reconnecting');
 
@@ -156,9 +181,15 @@ export function useAgentGuardWebSocket({
       // Exponential backoff: 1s, 2s, 3s, 5s, up to 10s max
       const delayMs = Math.min(10000, Math.floor(1000 * Math.pow(1.5, Math.min(nextAttempt, 6))));
       const delaySec = Math.round(delayMs / 1000);
-      setNextRetrySeconds(delaySec);
+      if (isMountedRef.current) {
+        setNextRetrySeconds(delaySec);
+      }
 
       countdownTimerRef.current = setInterval(() => {
+        if (!isMountedRef.current) {
+          if (countdownTimerRef.current) clearInterval(countdownTimerRef.current);
+          return;
+        }
         setNextRetrySeconds((prev) => {
           if (prev <= 1) {
             if (countdownTimerRef.current) clearInterval(countdownTimerRef.current);
@@ -169,17 +200,22 @@ export function useAgentGuardWebSocket({
       }, 1000);
 
       reconnectTimerRef.current = setTimeout(() => {
-        connect();
+        if (isMountedRef.current) {
+          connect();
+        }
       }, delayMs);
 
       return nextAttempt;
     });
   }, [clearAllTimers, connect]);
 
-  // Initial connection on mount
+  // Initial connection on mount & unmount cleanup
   useEffect(() => {
+    isMountedRef.current = true;
     connect();
     return () => {
+      isMountedRef.current = false;
+      intentionalCloseRef.current = true;
       clearAllTimers();
       if (wsRef.current) {
         try {
@@ -187,6 +223,7 @@ export function useAgentGuardWebSocket({
         } catch {
           // ignore
         }
+        wsRef.current = null;
       }
     };
   }, [connect, clearAllTimers]);
@@ -198,7 +235,9 @@ export function useAgentGuardWebSocket({
       onFallbackPollRef.current();
       // Then every 6 seconds
       fallbackPollIntervalRef.current = setInterval(() => {
-        onFallbackPollRef.current?.();
+        if (isMountedRef.current) {
+          onFallbackPollRef.current?.();
+        }
       }, 6000);
     } else {
       if (fallbackPollIntervalRef.current) {
@@ -216,8 +255,10 @@ export function useAgentGuardWebSocket({
   }, [status]);
 
   const manualReconnect = useCallback(() => {
-    setReconnectAttempt(0);
-    connect();
+    if (isMountedRef.current) {
+      setReconnectAttempt(0);
+      connect();
+    }
   }, [connect]);
 
   return {

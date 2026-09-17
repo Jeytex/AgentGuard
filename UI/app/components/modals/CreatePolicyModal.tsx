@@ -81,6 +81,9 @@ export function CreatePolicyModal({ isOpen, onClose, onSubmit }: CreatePolicyMod
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm" onClick={onClose}>
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="create-policy-title"
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-lg rounded-2xl border border-[var(--line)] bg-[#0e1115] p-6 shadow-2xl"
       >
@@ -90,12 +93,13 @@ export function CreatePolicyModal({ isOpen, onClose, onSubmit }: CreatePolicyMod
               <BookOpen className="size-4" />
             </div>
             <div>
-              <h3 className="font-semibold text-white">Create Security Policy</h3>
+              <h3 id="create-policy-title" className="font-semibold text-white">Create Security Policy</h3>
               <p className="text-xs text-[var(--muted)]">Dynamically indexes into Moss in-process memory</p>
             </div>
           </div>
           <button
             onClick={onClose}
+            aria-label="Close dialog"
             className="rounded-lg p-1.5 text-[var(--muted)] hover:bg-white/5 hover:text-white"
           >
             <X className="size-4" />

@@ -105,6 +105,46 @@ async def root():
     )
 
 
+@app.get("/health", summary="Container Health Check")
+async def health():
+    return JSONResponse(
+        content={
+            "status": "healthy",
+            "service": settings.APP_NAME,
+            "version": settings.VERSION,
+        }
+    )
+
+
+@app.get("/health/live", summary="Liveness Probe")
+async def liveness():
+    return JSONResponse(content={"status": "alive"})
+
+
+@app.get("/health/ready", summary="Readiness Probe")
+async def readiness():
+    from app.db import get_db_manager
+    try:
+        with get_db_manager().get_read_connection() as conn:
+            conn.execute("SELECT 1;").fetchone()
+        provider = get_retrieval_provider()
+        mode = provider.get_mode()
+        return JSONResponse(
+            content={
+                "status": "ready",
+                "database": "connected",
+                "retrieval_mode": mode,
+            }
+        )
+    except Exception as e:
+        logger.error("Readiness check failed: %s", str(e))
+        return JSONResponse(
+            status_code=503,
+            content={"status": "not_ready", "error": str(e)},
+        )
+
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app.main:app", host=settings.HOST, port=settings.PORT, reload=True)
