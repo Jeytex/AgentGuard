@@ -24,6 +24,10 @@ def test_health_endpoint(client):
     assert data["status"] == "ok"
     assert data["total_policies_indexed"] > 0
 
+    # Render health-checker HEAD request support
+    head_response = client.head("/api/v1/health")
+    assert head_response.status_code == 200
+
 
 def test_list_policies(client):
     response = client.get("/api/v1/policies")
@@ -117,21 +121,30 @@ def test_hitl_approval_lifecycle(client):
 
 
 def test_container_health_probes(client):
-    # Root /health for Docker & AWS ECS / GCP Cloud Run probes
+    # Root /health for Docker & AWS ECS / GCP Cloud Run / Render probes (GET & HEAD)
     res = client.get("/health")
     assert res.status_code == 200
     assert res.json()["status"] == "healthy"
 
-    # Kubernetes liveness probe
+    head_res = client.head("/health")
+    assert head_res.status_code == 200
+
+    # Kubernetes liveness probe (GET & HEAD)
     live_res = client.get("/health/live")
     assert live_res.status_code == 200
     assert live_res.json()["status"] == "alive"
 
-    # Kubernetes readiness probe
+    live_head = client.head("/health/live")
+    assert live_head.status_code == 200
+
+    # Kubernetes readiness probe (GET & HEAD)
     ready_res = client.get("/health/ready")
     assert ready_res.status_code == 200
     assert ready_res.json()["status"] == "ready"
     assert ready_res.json()["database"] == "connected"
+
+    ready_head = client.head("/health/ready")
+    assert ready_head.status_code == 200
 
 
 def test_system_backup_and_prune_api(client):

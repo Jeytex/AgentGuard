@@ -60,12 +60,16 @@ class RetrievalProvider(ABC):
 
     @abstractmethod
     def is_connected(self) -> bool:
-        """Check if provider is initialized and healthy."""
+        """Check if provider is initialized and operational."""
         pass
+
+    def is_live_moss_connected(self) -> bool:
+        """Check specifically if live Moss cloud service is connected and healthy."""
+        return False
 
     @abstractmethod
     def get_mode(self) -> str:
-        """Return 'live_moss' or 'fallback_mock'."""
+        """Return 'live_moss', 'fallback_mock', 'degraded_local', or 'moss_degraded'."""
         pass
 
 
@@ -81,17 +85,30 @@ def get_retrieval_provider() -> RetrievalProvider:
     from app.retrieval.mock_client import MockRetrievalProvider
     from app.retrieval.moss_client import MossRetrievalProvider
 
-    if settings.MOSS_PROJECT_ID and settings.MOSS_PROJECT_KEY and not settings.MOSS_MOCK_FALLBACK:
+    if settings.MOSS_PROJECT_ID and settings.MOSS_PROJECT_KEY:
         try:
             _global_provider = MossRetrievalProvider(
                 project_id=settings.MOSS_PROJECT_ID,
                 project_key=settings.MOSS_PROJECT_KEY,
+                allow_fallback=settings.MOSS_MOCK_FALLBACK,
             )
             return _global_provider
         except Exception:
-            _global_provider = MockRetrievalProvider()
-            return _global_provider
+            if settings.MOSS_MOCK_FALLBACK:
+                _global_provider = MockRetrievalProvider()
+                return _global_provider
+            raise
     else:
         _global_provider = MockRetrievalProvider()
         return _global_provider
+
+
+def set_retrieval_provider(provider: Optional[RetrievalProvider]) -> None:
+    global _global_provider
+    _global_provider = provider
+
+
+def reset_retrieval_provider() -> None:
+    global _global_provider
+    _global_provider = None
 

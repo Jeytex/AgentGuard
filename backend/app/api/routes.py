@@ -320,8 +320,9 @@ async def run_scenario(
 # ==============================================================================
 # 6. System Health & Telemetry
 # ==============================================================================
-@router.get(
+@router.api_route(
     "/health",
+    methods=["GET", "HEAD"],
     response_model=SystemHealth,
     summary="Check AgentGuard health, Moss connection state, and uptime",
 )
@@ -330,9 +331,15 @@ async def health_check():
     guard = get_guard_engine()
     uptime = round(time.time() - _server_start_time, 1)
 
+    moss_connected = (
+        provider.is_live_moss_connected()
+        if hasattr(provider, "is_live_moss_connected")
+        else (provider.is_connected() and provider.get_mode() == "live_moss")
+    )
+
     return SystemHealth(
         status="ok",
-        moss_connected=provider.is_connected(),
+        moss_connected=moss_connected,
         active_mode=provider.get_mode(),
         total_policies_indexed=len(guard.get_all_policies()),
         total_incidents_indexed=0,

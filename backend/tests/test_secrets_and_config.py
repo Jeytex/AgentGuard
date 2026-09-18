@@ -126,3 +126,21 @@ def test_settings_sanitized_config():
     assert "sensitive_gemini_key_8888" not in str(sanitized)
     assert sanitized["moss_project_key_masked"].startswith("sup")
     assert sanitized["moss_project_key_masked"].endswith("999")
+
+
+def test_render_port_environment_override():
+    """
+    Verifies that when PORT is set (e.g. Render injecting PORT=10000), Settings dynamically
+    listens on that port, and falls back to 8000 for local development when absent.
+    """
+    with patch.dict(os.environ, {}, clear=False):
+        if "PORT" in os.environ:
+            del os.environ["PORT"]
+        s_default = Settings()
+        assert s_default.PORT == 8000
+        assert s_default.HOST == "0.0.0.0"
+
+    with patch.dict(os.environ, {"PORT": "10000"}):
+        s_render = Settings()
+        assert s_render.PORT == 10000
+        assert s_render.HOST == "0.0.0.0"

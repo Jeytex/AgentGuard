@@ -133,7 +133,15 @@ export function OverviewView({
                   {health?.total_policies_indexed ?? '—'}
                 </div>
                 <div className="mt-1 text-[11px] text-[var(--muted)]">
-                  {health?.moss_connected ? 'In-process active' : 'Checking connection...'}
+                  {health?.moss_connected
+                    ? 'In-process active'
+                    : health?.active_mode === 'degraded_local'
+                    ? 'Local fallback active'
+                    : health?.active_mode === 'moss_degraded'
+                    ? 'Moss degraded (quota limit)'
+                    : health?.active_mode === 'fallback_mock'
+                    ? 'Local mock active'
+                    : 'Checking connection...'}
                 </div>
               </div>
               <div className="rounded-xl bg-[var(--cyan)]/10 p-2.5 text-[var(--cyan)]">

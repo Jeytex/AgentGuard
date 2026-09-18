@@ -142,5 +142,9 @@ class MockRetrievalProvider(RetrievalProvider):
     def is_connected(self) -> bool:
         return self._initialized
 
+    def is_live_moss_connected(self) -> bool:
+        """Mock provider never claims live Moss cloud connectivity."""
+        return False
+
     def get_mode(self) -> str:
         return "fallback_mock"

@@ -30,6 +30,10 @@ async def lifespan(app: FastAPI):
     provider = get_retrieval_provider()
     guard = get_guard_engine()
 
+    # Register seed policies in guard lookup table first
+    for pol in get_seed_policies():
+        guard.register_policy(pol)
+
     try:
         await provider.initialize()
         logger.info(f"Retrieval provider active in mode: {provider.get_mode()}")
@@ -49,15 +53,29 @@ async def lifespan(app: FastAPI):
             ])
             await provider.load_index(settings.INCIDENT_INDEX_NAME)
 
-
-        # Register seed policies in guard lookup table
-        for pol in get_seed_policies():
-            guard.register_policy(pol)
-
         logger.info(f"Successfully seeded {len(seed_docs)} policies into Moss runtime.")
         logger.info("AgentGuard Sub-10ms Security Engine is HOT and ready for evaluation.")
     except Exception as e:
-        logger.error(f"Error during AgentGuard warmup: {e}", exc_info=True)
+        if hasattr(provider, "_mark_degraded"):
+            provider._mark_degraded(e)
+        allow_fallback = getattr(provider, "allow_fallback", settings.MOSS_MOCK_FALLBACK)
+        if allow_fallback and hasattr(provider, "_get_fallback_provider"):
+            logger.warning(
+                "Warmup encountered live Moss error (%s). Fallback enabled: priming in-process fallback provider.",
+                e,
+            )
+            fallback = provider._get_fallback_provider()
+            await fallback.create_index(settings.POLICY_INDEX_NAME, format_policies_for_moss())
+            await fallback.create_index(settings.INCIDENT_INDEX_NAME, [
+                {"id": "inc_init_001", "text": "System initialization baseline security precedent record.", "metadata": {"status": "initialized"}}
+            ])
+        else:
+            logger.warning(
+                "Warmup encountered live Moss error (%s). Fallback is disabled (MOSS_MOCK_FALLBACK=false). "
+                "Preserving graceful startup in mode: %s.",
+                e,
+                provider.get_mode(),
+            )
 
     yield
 
@@ -105,7 +123,7 @@ async def root():
     )
 
 
-@app.get("/health", summary="Container Health Check")
+@app.api_route("/health", methods=["GET", "HEAD"], summary="Container Health Check")
 async def health():
     return JSONResponse(
         content={
@@ -116,12 +134,12 @@ async def health():
     )
 
 
-@app.get("/health/live", summary="Liveness Probe")
+@app.api_route("/health/live", methods=["GET", "HEAD"], summary="Liveness Probe")
 async def liveness():
     return JSONResponse(content={"status": "alive"})
 
 
-@app.get("/health/ready", summary="Readiness Probe")
+@app.api_route("/health/ready", methods=["GET", "HEAD"], summary="Readiness Probe")
 async def readiness():
     from app.db import get_db_manager
     try:
@@ -129,11 +147,17 @@ async def readiness():
             conn.execute("SELECT 1;").fetchone()
         provider = get_retrieval_provider()
         mode = provider.get_mode()
+        moss_connected = (
+            provider.is_live_moss_connected()
+            if hasattr(provider, "is_live_moss_connected")
+            else (provider.is_connected() and mode == "live_moss")
+        )
         return JSONResponse(
             content={
                 "status": "ready",
                 "database": "connected",
                 "retrieval_mode": mode,
+                "moss_connected": moss_connected,
             }
         )
     except Exception as e:
@@ -147,4 +171,9 @@ async def readiness():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app.main:app", host=settings.HOST, port=settings.PORT, reload=True)
+    uvicorn.run(
+        "app.main:app",
+        host=settings.HOST,
+        port=settings.PORT,
+        reload=settings.DEBUG and settings.ENVIRONMENT == "development",
+    )

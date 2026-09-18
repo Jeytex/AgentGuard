@@ -97,11 +97,23 @@ export function Sidebar({
           <div className="flex items-center gap-2">
             <span
               className={`size-2 rounded-full ${
-                health?.moss_connected ? 'bg-[var(--green)]' : 'bg-[#e7b96b]'
+                health?.moss_connected
+                  ? 'bg-[var(--green)]'
+                  : health?.active_mode === 'moss_degraded'
+                  ? 'bg-[#ff6d7a]'
+                  : 'bg-[#e7b96b]'
               }`}
             />
             <span className="font-semibold text-white">
-              {health?.moss_connected ? 'Moss In-Process' : 'Connecting Engine'}
+              {health?.moss_connected
+                ? 'Moss In-Process'
+                : health?.active_mode === 'degraded_local'
+                ? 'Local Fallback'
+                : health?.active_mode === 'moss_degraded'
+                ? 'Moss Degraded'
+                : health?.active_mode === 'fallback_mock'
+                ? 'Mock Engine'
+                : 'Connecting Engine'}
             </span>
           </div>
           <div className="mt-1 text-[11px] text-[var(--muted)]">
