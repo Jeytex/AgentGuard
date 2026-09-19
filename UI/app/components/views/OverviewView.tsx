@@ -59,7 +59,7 @@ export function OverviewView({
           type="button"
           onClick={() => onNavigate('Interceptions')}
           aria-label="View all interceptions and audit decisions"
-          className="w-full border-0 p-0 text-left rounded-xl shadow-none focus:outline-none focus:ring-2 focus:ring-[var(--cyan)]/40"
+          className="metric-card w-full border-0 p-0 text-left rounded-xl shadow-none focus:outline-none focus:ring-2 focus:ring-[var(--cyan)]/40"
         >
           <Card className="p-5 transition hover:border-[var(--cyan)]/40 hover:bg-white/[0.02]">
             <div className="flex items-start justify-between">
@@ -79,7 +79,7 @@ export function OverviewView({
           type="button"
           onClick={() => onNavigate('Interceptions')}
           aria-label="View allow rate details in interceptions"
-          className="w-full border-0 p-0 text-left rounded-xl shadow-none focus:outline-none focus:ring-2 focus:ring-[var(--green)]/40"
+          className="metric-card w-full border-0 p-0 text-left rounded-xl shadow-none focus:outline-none focus:ring-2 focus:ring-[var(--green)]/40"
         >
           <Card className="p-5 transition hover:border-[var(--green)]/40 hover:bg-white/[0.02]">
             <div className="flex items-start justify-between">
@@ -101,7 +101,7 @@ export function OverviewView({
           type="button"
           onClick={() => onNavigate('Benchmarks')}
           aria-label="View telemetry and P95 latency benchmarks"
-          className="w-full border-0 p-0 text-left rounded-xl shadow-none focus:outline-none focus:ring-2 focus:ring-purple-400/40"
+          className="metric-card w-full border-0 p-0 text-left rounded-xl shadow-none focus:outline-none focus:ring-2 focus:ring-purple-400/40"
         >
           <Card className="p-5 transition hover:border-purple-400/40 hover:bg-white/[0.02]">
             <div className="flex items-start justify-between">
@@ -123,7 +123,7 @@ export function OverviewView({
           type="button"
           onClick={() => onNavigate('Policies')}
           aria-label="View active security policies indexed in Moss"
-          className="w-full border-0 p-0 text-left rounded-xl shadow-none focus:outline-none focus:ring-2 focus:ring-[var(--cyan)]/40"
+          className="metric-card w-full border-0 p-0 text-left rounded-xl shadow-none focus:outline-none focus:ring-2 focus:ring-[var(--cyan)]/40"
         >
           <Card className="p-5 transition hover:border-[var(--cyan)]/40 hover:bg-white/[0.02]">
             <div className="flex items-start justify-between">

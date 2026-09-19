@@ -6,6 +6,7 @@
 [class*="border-[var(--line)]"]{border-color:var(--line)!important} [class*="bg-[var(--panel)]"]{background-color:var(--panel)!important} [class*="bg-[var(--panel2)]"]{background-color:var(--panel2)!important} [class*="text-[var(--text)]"], [class*="text-white"]{color:var(--text)!important} [class*="text-[var(--muted)]"]{color:var(--muted)!important} [class*="bg-white/"]{background-color:#fffaf0!important} [class*="bg-black"]{background-color:var(--line)!important}
 button{border-radius:10px} main button:hover{transform:translateY(-1px)}
 main button:not([class*="p-2"]):not([class*="p-1"]){border-width:2px;border-color:var(--line);box-shadow:2px 2px 0 var(--line)}
+main button.metric-card{border:0;box-shadow:none;padding:0}
 .retro-window{box-shadow:4px 4px 0 var(--line);position:relative}
 .retro-window::before{content:"";position:absolute;top:8px;right:10px;width:6px;height:6px;border-radius:999px;background:var(--amber);box-shadow:-10px 0 0 var(--pink),-20px 0 0 var(--green);opacity:.9}
 
