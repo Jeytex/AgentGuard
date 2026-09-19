@@ -23,6 +23,8 @@ dist/
 *.tsbuildinfo
 .npm
 .pnpm-store
+AGENTS.md
+CLAUDE.md
 
 # OS files
 .DS_Store

@@ -55,7 +55,7 @@ export function Sidebar({
     <aside
       className={`${
         mobileOpen ? 'block' : 'hidden'
-      } absolute inset-y-16 z-20 w-64 border-r border-[var(--line)] bg-[var(--panel)] p-3 md:static md:block`}
+      } absolute inset-y-16 z-20 w-64 border-r-2 border-[var(--line)] bg-[var(--purple)]/25 p-3 md:static md:block`}
     >
       <div className="mb-4 px-3 pt-3 text-[10px] font-bold uppercase tracking-[.2em] text-[var(--muted)]">
         Control Center
@@ -73,8 +73,8 @@ export function Sidebar({
               }}
               className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-medium transition ${
                 isActive
-                  ? 'bg-white/10 text-white shadow-sm'
-                  : 'text-[var(--muted)] hover:bg-white/5 hover:text-white'
+                  ? 'bg-[var(--pink)] text-[var(--text)] shadow-[3px_3px_0_var(--line)] border-2 border-[var(--line)]'
+                  : 'text-[var(--text)] hover:bg-[var(--cyan)]/60 hover:text-[var(--text)]'
               }`}
             >
               <Icon className={`size-4 ${isActive ? 'text-[var(--cyan)]' : ''}`} />

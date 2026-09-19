@@ -52,13 +52,15 @@ class MossRetrievalProvider(RetrievalProvider):
         return self._fallback_provider
 
     def _mark_degraded(self, e: Exception) -> None:
+        err_str = str(e)
+        if "index_exists" in err_str.lower() or "already exists" in err_str.lower() or "409" in err_str:
+            return
         self._connected = False
         self._degraded = True
-        err_str = str(e)
         if "credit_exhausted" in err_str.lower() or "usage_limit_exceeded" in err_str.lower() or "429" in err_str:
             self._degraded_reason = "credit_exhausted"
         else:
-            self._degraded_reason = err_str
+            self._degraded_reason = str(e)
         logger.warning(
             "Live Moss provider transitioned to DEGRADED state (reason: %s). Fallback allowed: %s",
             self._degraded_reason,
@@ -266,6 +268,14 @@ class MossRetrievalProvider(RetrievalProvider):
             await self.client.create_index(index_name, doc_infos)
             await self.load_index(index_name)
         except Exception as e:
+            err_str = str(e)
+            if "index_exists" in err_str.lower() or "already exists" in err_str.lower() or "409" in err_str:
+                logger.info(
+                    "Index '%s' already exists in live Moss cloud. Loading existing index.",
+                    index_name,
+                )
+                await self.load_index(index_name)
+                return
             self._mark_degraded(e)
             if self.allow_fallback:
                 self._fallback_active = True

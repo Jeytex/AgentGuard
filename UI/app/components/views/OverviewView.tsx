@@ -55,101 +55,89 @@ export function OverviewView({
     <div className="space-y-6">
       {/* Metric Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <button
-          type="button"
+        <Card
           onClick={() => onNavigate('Interceptions')}
           aria-label="View all interceptions and audit decisions"
-          className="w-full text-left rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--cyan)]/40"
+          className="p-5 transition hover:border-[var(--cyan)]/40 hover:bg-white/[0.02]"
         >
-          <Card className="p-5 transition hover:border-[var(--cyan)]/40 hover:bg-white/[0.02]">
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="text-xs font-medium text-[var(--muted)]">Total Decisions</div>
-                <div className="mt-2 text-2xl font-bold text-white">{metrics.total}</div>
-                <div className="mt-1 text-[11px] text-[var(--muted)]">Persisted audit events</div>
-              </div>
-              <div className="rounded-xl bg-[var(--cyan)]/10 p-2.5 text-[var(--cyan)]">
-                <Activity className="size-5" />
-              </div>
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="text-xs font-medium text-[var(--muted)]">Total Decisions</div>
+              <div className="mt-2 text-2xl font-bold text-white">{metrics.total}</div>
+              <div className="mt-1 text-[11px] text-[var(--muted)]">Persisted audit events</div>
             </div>
-          </Card>
-        </button>
+            <div className="rounded-xl bg-[var(--cyan)]/10 p-2.5 text-[var(--cyan)]">
+              <Activity className="size-5" />
+            </div>
+          </div>
+        </Card>
 
-        <button
-          type="button"
+        <Card
           onClick={() => onNavigate('Interceptions')}
           aria-label="View allow rate details in interceptions"
-          className="w-full text-left rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--green)]/40"
+          className="p-5 transition hover:border-[var(--green)]/40 hover:bg-white/[0.02]"
         >
-          <Card className="p-5 transition hover:border-[var(--green)]/40 hover:bg-white/[0.02]">
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="text-xs font-medium text-[var(--muted)]">Allow Rate</div>
-                <div className="mt-2 text-2xl font-bold text-[var(--green)]">
-                  {interceptions.length > 0 ? `${metrics.allowRate}%` : '100%'}
-                </div>
-                <div className="mt-1 text-[11px] text-[var(--muted)]">Policy compliant actions</div>
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="text-xs font-medium text-[var(--muted)]">Allow Rate</div>
+              <div className="mt-2 text-2xl font-bold text-[var(--green)]">
+                {interceptions.length > 0 ? `${metrics.allowRate}%` : '100%'}
               </div>
-              <div className="rounded-xl bg-[var(--green)]/10 p-2.5 text-[var(--green)]">
-                <CheckCircle2 className="size-5" />
-              </div>
+              <div className="mt-1 text-[11px] text-[var(--muted)]">Policy compliant actions</div>
             </div>
-          </Card>
-        </button>
+            <div className="rounded-xl bg-[var(--green)]/10 p-2.5 text-[var(--green)]">
+              <CheckCircle2 className="size-5" />
+            </div>
+          </div>
+        </Card>
 
-        <button
-          type="button"
+        <Card
           onClick={() => onNavigate('Benchmarks')}
           aria-label="View telemetry and P95 latency benchmarks"
-          className="w-full text-left rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400/40"
+          className="p-5 transition hover:border-purple-400/40 hover:bg-white/[0.02]"
         >
-          <Card className="p-5 transition hover:border-purple-400/40 hover:bg-white/[0.02]">
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="text-xs font-medium text-[var(--muted)]">P95 Pipeline Latency</div>
-                <div className="mt-2 text-2xl font-bold text-white">{metrics.p95}</div>
-                <div className="mt-1 text-[11px] text-[var(--muted)]">
-                  {benchmarkResult ? 'From live benchmark' : 'Target: sub-10ms'}
-                </div>
-              </div>
-              <div className="rounded-xl bg-purple-400/10 p-2.5 text-purple-400">
-                <Gauge className="size-5" />
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="text-xs font-medium text-[var(--muted)]">P95 Pipeline Latency</div>
+              <div className="mt-2 text-2xl font-bold text-white">{metrics.p95}</div>
+              <div className="mt-1 text-[11px] text-[var(--muted)]">
+                {benchmarkResult ? 'From live benchmark' : 'Target: sub-10ms'}
               </div>
             </div>
-          </Card>
-        </button>
+            <div className="rounded-xl bg-purple-400/10 p-2.5 text-purple-400">
+              <Gauge className="size-5" />
+            </div>
+          </div>
+        </Card>
 
-        <button
-          type="button"
+        <Card
           onClick={() => onNavigate('Policies')}
           aria-label="View active security policies indexed in Moss"
-          className="w-full text-left rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--cyan)]/40"
+          className="p-5 transition hover:border-[var(--cyan)]/40 hover:bg-white/[0.02]"
         >
-          <Card className="p-5 transition hover:border-[var(--cyan)]/40 hover:bg-white/[0.02]">
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="text-xs font-medium text-[var(--muted)]">Policies Indexed in Moss</div>
-                <div className="mt-2 text-2xl font-bold text-[var(--cyan)]">
-                  {health?.total_policies_indexed ?? '—'}
-                </div>
-                <div className="mt-1 text-[11px] text-[var(--muted)]">
-                  {health?.moss_connected
-                    ? 'In-process active'
-                    : health?.active_mode === 'degraded_local'
-                    ? 'Local fallback active'
-                    : health?.active_mode === 'moss_degraded'
-                    ? 'Moss degraded (quota limit)'
-                    : health?.active_mode === 'fallback_mock'
-                    ? 'Local mock active'
-                    : 'Checking connection...'}
-                </div>
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="text-xs font-medium text-[var(--muted)]">Policies Indexed in Moss</div>
+              <div className="mt-2 text-2xl font-bold text-[var(--cyan)]">
+                {health?.total_policies_indexed ?? '—'}
               </div>
-              <div className="rounded-xl bg-[var(--cyan)]/10 p-2.5 text-[var(--cyan)]">
-                <Database className="size-5" />
+              <div className="mt-1 text-[11px] text-[var(--muted)]">
+                {health?.moss_connected
+                  ? 'In-process active'
+                  : health?.active_mode === 'degraded_local'
+                  ? 'Local fallback active'
+                  : health?.active_mode === 'moss_degraded'
+                  ? 'Moss degraded (quota limit)'
+                  : health?.active_mode === 'fallback_mock'
+                  ? 'Local mock active'
+                  : 'Checking connection...'}
               </div>
             </div>
-          </Card>
-        </button>
+            <div className="rounded-xl bg-[var(--cyan)]/10 p-2.5 text-[var(--cyan)]">
+              <Database className="size-5" />
+            </div>
+          </div>
+        </Card>
       </div>
 
       {/* Main Grid: Activity Stream & Decision Distribution */}
@@ -275,7 +263,7 @@ export function OverviewView({
       <Card className="border-purple-400/20 bg-purple-400/5 p-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-4">
-            <div className="rounded-xl bg-purple-400/15 p-2.5 text-purple-400">
+            <div className="rounded-xl border border-[var(--line)]/20 bg-[var(--purple)]/25 p-2.5 text-[var(--line)]">
               <Zap className="size-5" />
             </div>
             <div>
@@ -289,7 +277,7 @@ export function OverviewView({
           </div>
           <button
             onClick={() => onNavigate('Benchmarks')}
-            className="flex items-center gap-1.5 self-start rounded-xl border border-purple-400/40 bg-purple-400/15 px-4 py-2 text-xs font-semibold text-purple-200 transition hover:bg-purple-400/25 sm:self-center"
+            className="flex items-center gap-1.5 self-start rounded-xl border-2 border-[var(--line)] bg-[var(--purple)] px-4 py-2 text-xs font-bold text-[var(--line)] shadow-[2px_2px_0_var(--line)] transition hover:-translate-y-0.5 hover:opacity-95 sm:self-center cursor-pointer"
           >
             {benchmarkResult ? 'View Full Telemetry' : 'Run Benchmark'} <ArrowUpRight className="size-4" />
           </button>
@@ -300,7 +288,7 @@ export function OverviewView({
       <Card className="border-[#56d8e433] bg-[#56d8e408] p-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-4">
-            <div className="rounded-xl bg-[#56d8e41a] p-2.5 text-[var(--cyan)]">
+            <div className="rounded-xl border border-[var(--line)]/20 bg-[var(--cyan)]/25 p-2.5 text-[var(--line)]">
               <Terminal className="size-5" />
             </div>
             <div>
@@ -312,7 +300,7 @@ export function OverviewView({
           </div>
           <button
             onClick={() => onNavigate('Simulator')}
-            className="flex items-center gap-1.5 self-start rounded-xl bg-[var(--cyan)] px-4 py-2 text-xs font-semibold text-black transition hover:opacity-90 sm:self-center"
+            className="flex items-center gap-1.5 self-start rounded-xl border-2 border-[var(--line)] bg-[var(--cyan)] px-4 py-2 text-xs font-bold text-[var(--line)] shadow-[2px_2px_0_var(--line)] transition hover:-translate-y-0.5 hover:opacity-95 sm:self-center cursor-pointer"
           >
             Launch Simulator <ArrowUpRight className="size-4" />
           </button>
