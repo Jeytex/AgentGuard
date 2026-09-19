@@ -46,12 +46,26 @@ export function SimulatorView({
   const [contextText, setContextText] = useState('Customer requested emergency refund due to service disruption.');
   const [customRunning, setCustomRunning] = useState(false);
   const [customError, setCustomError] = useState<string | null>(null);
+  const [mossDegraded, setMossDegraded] = useState<string | null>(null);
 
   const handleRunPreset = async (scenarioId: string) => {
     setRunningId(scenarioId);
+    setMossDegraded(null);
     try {
       const res = await onRunScenario(scenarioId);
       setLatestResult(res);
+    } catch (err: any) {
+      if (
+        err?.code === 'MOSS_UNAVAILABLE' ||
+        err?.reason === 'credit_exhausted' ||
+        err?.message?.includes('503') ||
+        err?.message?.includes('credit_exhausted') ||
+        err?.message?.includes('MOSS_UNAVAILABLE')
+      ) {
+        setMossDegraded(
+          'Moss Quota Exhausted: Live Moss in-process retrieval engine is temporarily unavailable (HTTP 503 credit_exhausted). Local fallback is disabled (MOSS_MOCK_FALLBACK=false).'
+        );
+      }
     } finally {
       setRunningId(null);
     }
@@ -60,6 +74,7 @@ export function SimulatorView({
   const handleRunCustom = async (e: React.FormEvent) => {
     e.preventDefault();
     setCustomError(null);
+    setMossDegraded(null);
     let parsedParams = {};
     try {
       parsedParams = JSON.parse(parametersJson);
@@ -80,7 +95,19 @@ export function SimulatorView({
       });
       setLatestResult(res);
     } catch (err: any) {
-      setCustomError(err?.message || 'Evaluation failed');
+      if (
+        err?.code === 'MOSS_UNAVAILABLE' ||
+        err?.reason === 'credit_exhausted' ||
+        err?.message?.includes('503') ||
+        err?.message?.includes('credit_exhausted') ||
+        err?.message?.includes('MOSS_UNAVAILABLE')
+      ) {
+        setMossDegraded(
+          'Moss Quota Exhausted: Live Moss in-process retrieval engine is temporarily unavailable (HTTP 503 credit_exhausted). Local fallback is disabled (MOSS_MOCK_FALLBACK=false).'
+        );
+      } else {
+        setCustomError(err?.message || 'Evaluation failed');
+      }
     } finally {
       setCustomRunning(false);
     }
@@ -128,6 +155,31 @@ export function SimulatorView({
           </div>
         </div>
       </Card>
+
+      {/* Moss Degraded / Credit Exhausted Banner */}
+      {mossDegraded && (
+        <Card className="border-amber-500/40 bg-amber-500/10 p-5">
+          <div className="flex items-start gap-3.5">
+            <div className="rounded-xl bg-amber-500/20 p-2.5 text-amber-400">
+              <AlertTriangle className="size-5" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-amber-300">
+                Moss Quota Exhausted (HTTP 503 Service Unavailable)
+              </h3>
+              <p className="text-xs leading-relaxed text-amber-200/90">
+                {mossDegraded}
+              </p>
+              <div className="pt-1 flex items-center gap-2 text-[11px] text-amber-300/80">
+                <span className="font-mono bg-amber-500/20 px-2 py-0.5 rounded border border-amber-500/30">
+                  MOSS_MOCK_FALLBACK=false
+                </span>
+                <span>• Live Moss cloud usage limit reached; silent mock fallback is prohibited.</span>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
 
       {/* Latest Evaluation Result Banner */}
       {latestResult && (

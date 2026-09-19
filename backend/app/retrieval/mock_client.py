@@ -29,7 +29,18 @@ class MockRetrievalProvider(RetrievalProvider):
 
     async def load_index(self, index_name: str) -> None:
         if index_name not in self._indexes:
-            self._indexes[index_name] = []
+            if index_name == "agentguard-policies":
+                from app.data.seed_policies import format_policies_for_moss
+                self._indexes[index_name] = [
+                    {
+                        "id": str(doc.get("id", f"doc_{i}")),
+                        "text": str(doc.get("text", "")),
+                        "metadata": dict(doc.get("metadata", {})),
+                    }
+                    for i, doc in enumerate(format_policies_for_moss())
+                ]
+            else:
+                self._indexes[index_name] = []
         self._loaded_indexes.add(index_name)
         logger.info(f"Loaded in-memory index '{index_name}' ({len(self._indexes[index_name])} docs).")
 

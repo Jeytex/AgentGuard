@@ -25,15 +25,54 @@ const getApiBase = (): string => {
 
 const API_BASE = getApiBase();
 
+export class MossUnavailableError extends Error {
+  public code: string;
+  public reason: string;
+  public status: string;
+  public activeMode: string;
+  public detail: string;
+
+  constructor(data: {
+    code?: string;
+    reason?: string;
+    status?: string;
+    active_mode?: string;
+    detail?: string;
+    message?: string;
+  }) {
+    super(
+      data.detail ||
+        `Live Moss retrieval is unavailable (${data.reason || 'credit_exhausted'}). Local fallback is disabled.`
+    );
+    this.name = 'MossUnavailableError';
+    this.code = data.code || 'MOSS_UNAVAILABLE';
+    this.reason = data.reason || 'credit_exhausted';
+    this.status = data.status || 'degraded';
+    this.activeMode = data.active_mode || 'moss_degraded';
+    this.detail = data.detail || this.message;
+  }
+}
+
 async function handleResponse<T>(res: Response, endpoint: string): Promise<T> {
   if (!res.ok) {
     let errorDetail = res.statusText;
+    let errJson: any = null;
     try {
-      const errJson = await res.json();
-      errorDetail = errJson.detail || JSON.stringify(errJson);
+      errJson = await res.json();
+      errorDetail = errJson.detail || errJson.message || JSON.stringify(errJson);
     } catch {
       // ignore
     }
+
+    if (
+      res.status === 503 &&
+      (errJson?.code === 'MOSS_UNAVAILABLE' ||
+        errJson?.reason === 'credit_exhausted' ||
+        errJson?.error === 'MOSS_UNAVAILABLE')
+    ) {
+      throw new MossUnavailableError(errJson || {});
+    }
+
     throw new Error(`API Error [${res.status}] at ${endpoint}: ${errorDetail}`);
   }
   return res.json() as Promise<T>;

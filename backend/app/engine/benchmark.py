@@ -60,8 +60,16 @@ class BenchmarkRunner:
     """
 
     def __init__(self, provider: Optional[RetrievalProvider] = None, guard: Optional[Any] = None):
-        self.provider = provider or get_retrieval_provider()
+        self._provider = provider
         self._guard = guard
+
+    @property
+    def provider(self) -> RetrievalProvider:
+        return self._provider if self._provider is not None else get_retrieval_provider()
+
+    @provider.setter
+    def provider(self, val: Optional[RetrievalProvider]) -> None:
+        self._provider = val
 
     @property
     def guard(self):

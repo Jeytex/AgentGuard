@@ -294,11 +294,25 @@ export default function App() {
         detail: `Moss speedup: ${res.speedup_factor.toFixed(1)}x faster than cloud vector DB`,
       });
     } catch (err: any) {
-      addToast({
-        type: 'error',
-        title: 'Benchmark Failed',
-        detail: err.message,
-      });
+      if (
+        err instanceof api.MossUnavailableError ||
+        err?.code === 'MOSS_UNAVAILABLE' ||
+        err?.reason === 'credit_exhausted' ||
+        err?.message?.includes('credit_exhausted') ||
+        err?.message?.includes('503')
+      ) {
+        addToast({
+          type: 'warning',
+          title: 'Moss Quota Exhausted',
+          detail: 'Live Moss retrieval is unavailable (credit_exhausted). Local mock fallback is disabled (MOSS_MOCK_FALLBACK=false).',
+        });
+      } else {
+        addToast({
+          type: 'error',
+          title: 'Benchmark Failed',
+          detail: err.message,
+        });
+      }
     } finally {
       setRunningBenchmark(false);
     }
@@ -310,11 +324,25 @@ export default function App() {
       handleLiveActionEvaluated(res);
       return res;
     } catch (err: any) {
-      addToast({
-        type: 'error',
-        title: 'Scenario Execution Failed',
-        detail: err.message,
-      });
+      if (
+        err instanceof api.MossUnavailableError ||
+        err?.code === 'MOSS_UNAVAILABLE' ||
+        err?.reason === 'credit_exhausted' ||
+        err?.message?.includes('credit_exhausted') ||
+        err?.message?.includes('503')
+      ) {
+        addToast({
+          type: 'warning',
+          title: 'Moss Quota Exhausted',
+          detail: 'Live Moss retrieval is unavailable (credit_exhausted). Local mock fallback is disabled (MOSS_MOCK_FALLBACK=false).',
+        });
+      } else {
+        addToast({
+          type: 'error',
+          title: 'Scenario Execution Failed',
+          detail: err.message,
+        });
+      }
       throw err;
     }
   };
@@ -325,11 +353,25 @@ export default function App() {
       handleLiveActionEvaluated(res);
       return res;
     } catch (err: any) {
-      addToast({
-        type: 'error',
-        title: 'Custom Evaluation Failed',
-        detail: err.message,
-      });
+      if (
+        err instanceof api.MossUnavailableError ||
+        err?.code === 'MOSS_UNAVAILABLE' ||
+        err?.reason === 'credit_exhausted' ||
+        err?.message?.includes('credit_exhausted') ||
+        err?.message?.includes('503')
+      ) {
+        addToast({
+          type: 'warning',
+          title: 'Moss Quota Exhausted',
+          detail: 'Live Moss retrieval is unavailable (credit_exhausted). Local mock fallback is disabled (MOSS_MOCK_FALLBACK=false).',
+        });
+      } else {
+        addToast({
+          type: 'error',
+          title: 'Custom Evaluation Failed',
+          detail: err.message,
+        });
+      }
       throw err;
     }
   };

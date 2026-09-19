@@ -189,3 +189,76 @@ async def test_graceful_startup_with_moss_credit_exhaustion():
             assert mock_provider.is_connected() is False
             assert mock_provider.get_mode() == "moss_degraded"
 
+
+def test_degraded_moss_endpoints_return_503_with_cors():
+    """
+    Verifies requirement:
+    - When Moss is in moss_degraded because of credit_exhausted,
+      /api/v1/guard/evaluate, /api/v1/simulator/run, and /api/v1/benchmark
+      must return HTTP 503 with structured JSON (MOSS_UNAVAILABLE / credit_exhausted).
+    - Ensures CORS middleware / response attaches Access-Control-Allow-Origin
+      even on these error responses so the browser displays the real 503 error.
+    """
+    client = TestClient(app)
+
+    # Configure a degraded provider with fallback disabled
+    degraded_provider = MossRetrievalProvider(
+        project_id="test_pid",
+        project_key="test_pkey",
+        allow_fallback=False,
+    )
+    degraded_provider._mark_degraded(
+        RuntimeError('HTTP 429 Too Many Requests: {"error":"USAGE_LIMIT_EXCEEDED","message":"credit_exhausted"}')
+    )
+    set_retrieval_provider(degraded_provider)
+
+    test_origin = "https://agentguard-console.vercel.app"
+    request_headers = {"Origin": test_origin}
+
+    # 1. POST /api/v1/guard/evaluate
+    eval_res = client.post(
+        "/api/v1/guard/evaluate",
+        json={
+            "agent_id": "test-bot",
+            "agent_role": "tier_1_support",
+            "tool_name": "stripe_issue_refund",
+            "parameters": {"amount": 2500, "customer_id": "c_123"},
+            "context": "Customer requested refund",
+            "dry_run": False,
+        },
+        headers=request_headers,
+    )
+    assert eval_res.status_code == 503
+    eval_data = eval_res.json()
+    assert eval_data["code"] == "MOSS_UNAVAILABLE"
+    assert eval_data["reason"] == "credit_exhausted"
+    assert eval_data["status"] == "degraded"
+    assert "detail" in eval_data
+    assert eval_res.headers.get("access-control-allow-origin") == test_origin
+
+    # 2. POST /api/v1/simulator/run
+    sim_res = client.post(
+        "/api/v1/simulator/run",
+        json={"scenario_id": "excessive_refund"},
+        headers=request_headers,
+    )
+    assert sim_res.status_code == 503
+    sim_data = sim_res.json()
+    assert sim_data["code"] == "MOSS_UNAVAILABLE"
+    assert sim_data["reason"] == "credit_exhausted"
+    assert sim_data["status"] == "degraded"
+    assert sim_res.headers.get("access-control-allow-origin") == test_origin
+
+    # 3. POST /api/v1/benchmark
+    bench_res = client.post(
+        "/api/v1/benchmark",
+        json={"iterations": 2, "warmup": 1},
+        headers=request_headers,
+    )
+    assert bench_res.status_code == 503
+    bench_data = bench_res.json()
+    assert bench_data["code"] == "MOSS_UNAVAILABLE"
+    assert bench_data["reason"] == "credit_exhausted"
+    assert bench_data["status"] == "degraded"
+    assert bench_res.headers.get("access-control-allow-origin") == test_origin
+

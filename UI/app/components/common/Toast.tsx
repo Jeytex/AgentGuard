@@ -3,7 +3,7 @@ import { CheckCircle2, AlertTriangle, X } from 'lucide-react';
 
 export interface ToastMessage {
   id: string;
-  type: 'success' | 'error' | 'info';
+  type: 'success' | 'error' | 'info' | 'warning';
   title: string;
   detail?: string;
 }
@@ -38,11 +38,30 @@ function ToastItem({
 
   const isSuccess = toast.type === 'success';
   const isError = toast.type === 'error';
+  const isWarning = toast.type === 'warning';
 
-  const borderColor = isSuccess ? '#62d99a44' : isError ? '#ff6d7a44' : '#56d8e444';
-  const bgColor = isSuccess ? '#0d1d16' : isError ? '#230f12' : '#0e1a1f';
+  const borderColor = isSuccess
+    ? '#62d99a44'
+    : isError
+      ? '#ff6d7a44'
+      : isWarning
+        ? '#f59e0b44'
+        : '#56d8e444';
+  const bgColor = isSuccess
+    ? '#0d1d16'
+    : isError
+      ? '#230f12'
+      : isWarning
+        ? '#231b0f'
+        : '#0e1a1f';
   const Icon = isSuccess ? CheckCircle2 : AlertTriangle;
-  const iconColor = isSuccess ? '#62d99a' : isError ? '#ff6d7a' : '#56d8e4';
+  const iconColor = isSuccess
+    ? '#62d99a'
+    : isError
+      ? '#ff6d7a'
+      : isWarning
+        ? '#f59e0b'
+        : '#56d8e4';
 
   return (
     <div

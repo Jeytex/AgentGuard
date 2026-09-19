@@ -1,12 +1,13 @@
 import logging
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.config import settings
-from app.api.routes import router
+from app.api.routes import router, make_moss_degraded_response, is_moss_degraded_exception
 from app.retrieval.provider import get_retrieval_provider
+from app.retrieval.moss_client import MossUnavailableError
 from app.engine.guard import get_guard_engine
 from app.data.seed_policies import get_seed_policies, format_policies_for_moss
 
@@ -104,6 +105,22 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["X-Moss-Retrieval-Ms", "X-Guard-Total-Ms", "X-Guard-Verdict"],
 )
+
+
+@app.exception_handler(MossUnavailableError)
+async def moss_unavailable_exception_handler(request: Request, exc: MossUnavailableError):
+    return make_moss_degraded_response(request, exc)
+
+
+@app.exception_handler(RuntimeError)
+async def runtime_error_exception_handler(request: Request, exc: RuntimeError):
+    if is_moss_degraded_exception(exc):
+        return make_moss_degraded_response(request, exc)
+    return JSONResponse(
+        status_code=500,
+        content={"error": "INTERNAL_SERVER_ERROR", "detail": str(exc)},
+    )
+
 
 app.include_router(router, prefix="/api/v1")
 

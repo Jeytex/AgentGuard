@@ -48,11 +48,19 @@ class GuardEngine:
         retrieval_provider: Optional[RetrievalProvider] = None,
         approval_manager: Optional[ApprovalManager] = None,
     ):
-        self.provider = retrieval_provider or get_retrieval_provider()
+        self._provider = retrieval_provider
         self.approval_manager = approval_manager or get_approval_manager()
         self._policy_lookup: Dict[str, Dict[str, Any]] = {
             p["id"]: p for p in get_seed_policies()
         }
+
+    @property
+    def provider(self) -> RetrievalProvider:
+        return self._provider if self._provider is not None else get_retrieval_provider()
+
+    @provider.setter
+    def provider(self, val: Optional[RetrievalProvider]) -> None:
+        self._provider = val
 
     def register_policy(self, policy_data: Dict[str, Any]) -> None:
         self._policy_lookup[policy_data["id"]] = policy_data

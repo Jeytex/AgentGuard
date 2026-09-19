@@ -72,10 +72,10 @@ class Settings(BaseSettings):
     @classmethod
     def parse_cors_origins(cls, v: Any) -> List[str]:
         if isinstance(v, str):
-            parts = [part.strip() for part in v.split(",") if part.strip()]
+            parts = [part.strip().rstrip("/") for part in v.split(",") if part.strip()]
             return parts if parts else ["*"]
         if isinstance(v, list):
-            return v
+            return [str(part).strip().rstrip("/") for part in v if str(part).strip()]
         return ["*"]
 
     def model_post_init(self, __context: Any) -> None:

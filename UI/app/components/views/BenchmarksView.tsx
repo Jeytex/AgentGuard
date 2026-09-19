@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   Cpu,
   ArrowUpRight,
+  AlertTriangle,
 } from 'lucide-react';
 import { BenchmarkResult } from '../../types';
 import { Card } from '../common/Card';
@@ -28,9 +29,25 @@ export function BenchmarksView({
   running,
 }: BenchmarksViewProps) {
   const [iterations, setIterations] = useState(50);
+  const [mossDegraded, setMossDegraded] = useState<string | null>(null);
 
   const handleRun = async () => {
-    await onRunBenchmark(iterations);
+    setMossDegraded(null);
+    try {
+      await onRunBenchmark(iterations);
+    } catch (err: any) {
+      if (
+        err?.code === 'MOSS_UNAVAILABLE' ||
+        err?.reason === 'credit_exhausted' ||
+        err?.message?.includes('503') ||
+        err?.message?.includes('credit_exhausted') ||
+        err?.message?.includes('MOSS_UNAVAILABLE')
+      ) {
+        setMossDegraded(
+          'Moss Quota Exhausted: Live Moss retrieval engine is unavailable (HTTP 503 credit_exhausted). Side-by-side latency benchmark cannot run while live Moss is degraded and local fallback is disabled.'
+        );
+      }
+    }
   };
 
   const nativeMoss = benchmarkResult?.native_moss;
@@ -119,6 +136,31 @@ export function BenchmarksView({
           </div>
         ) : null}
       </Card>
+
+      {/* Moss Degraded Banner */}
+      {mossDegraded && (
+        <Card className="border-amber-500/40 bg-amber-500/10 p-5">
+          <div className="flex items-start gap-3.5">
+            <div className="rounded-xl bg-amber-500/20 p-2.5 text-amber-400">
+              <AlertTriangle className="size-5" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-amber-300">
+                Moss Quota Exhausted (HTTP 503 Service Unavailable)
+              </h3>
+              <p className="text-xs leading-relaxed text-amber-200/90">
+                {mossDegraded}
+              </p>
+              <div className="pt-1 flex items-center gap-2 text-[11px] text-amber-300/80">
+                <span className="font-mono bg-amber-500/20 px-2 py-0.5 rounded border border-amber-500/30">
+                  MOSS_MOCK_FALLBACK=false
+                </span>
+                <span>• Live Moss cloud usage limit reached; silent mock fallback is prohibited.</span>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
 
       {/* Latency Comparison Metric Cards (4 Pillars) */}
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">

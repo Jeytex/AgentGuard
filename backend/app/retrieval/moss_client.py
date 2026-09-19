@@ -7,6 +7,15 @@ from app.retrieval.provider import RetrievalProvider, RetrievalResult, Retrieved
 logger = logging.getLogger("agentguard.moss")
 
 
+class MossUnavailableError(RuntimeError):
+    """Raised when live Moss retrieval is degraded / unavailable and fallback is disabled."""
+
+    def __init__(self, message: str, reason: str = "credit_exhausted"):
+        super().__init__(message)
+        self.reason = reason
+        self.code = "MOSS_UNAVAILABLE"
+
+
 class MossRetrievalProvider(RetrievalProvider):
     """
     Production Retrieval Provider embedding the official Moss SDK runtime.
@@ -71,9 +80,10 @@ class MossRetrievalProvider(RetrievalProvider):
 
     async def load_index(self, index_name: str) -> None:
         if self._degraded and not self.allow_fallback:
-            raise RuntimeError(
+            raise MossUnavailableError(
                 f"Live Moss index '{index_name}' cannot be loaded: provider is degraded ({self._degraded_reason}). "
-                "MOSS_MOCK_FALLBACK is false."
+                "MOSS_MOCK_FALLBACK is false.",
+                reason=self._degraded_reason or "credit_exhausted",
             )
         if self._degraded and self.allow_fallback:
             fallback = self._get_fallback_provider()
@@ -97,7 +107,10 @@ class MossRetrievalProvider(RetrievalProvider):
                 fallback = self._get_fallback_provider()
                 await fallback.load_index(index_name)
             else:
-                raise
+                raise MossUnavailableError(
+                    f"Could not load live Moss index '{index_name}': {e}. MOSS_MOCK_FALLBACK is disabled.",
+                    reason=self._degraded_reason or "credit_exhausted",
+                )
 
     async def query(
         self,
@@ -108,9 +121,10 @@ class MossRetrievalProvider(RetrievalProvider):
     ) -> RetrievalResult:
         if self._degraded:
             if not self.allow_fallback:
-                raise RuntimeError(
+                raise MossUnavailableError(
                     f"Live Moss retrieval failed: service is in degraded state ({self._degraded_reason}). "
-                    "MOSS_MOCK_FALLBACK is disabled (MOSS_MOCK_FALLBACK=false); silent fallback is prohibited."
+                    "MOSS_MOCK_FALLBACK is disabled (MOSS_MOCK_FALLBACK=false); silent fallback is prohibited.",
+                    reason=self._degraded_reason or "credit_exhausted",
                 )
             self._fallback_active = True
             fallback = self._get_fallback_provider()
@@ -127,9 +141,10 @@ class MossRetrievalProvider(RetrievalProvider):
             except Exception as e:
                 self._mark_degraded(e)
                 if not self.allow_fallback:
-                    raise RuntimeError(
+                    raise MossUnavailableError(
                         f"Live Moss client initialization failed: {e}. "
-                        "MOSS_MOCK_FALLBACK is disabled."
+                        "MOSS_MOCK_FALLBACK is disabled.",
+                        reason=self._degraded_reason or "credit_exhausted",
                     )
                 self._fallback_active = True
                 fallback = self._get_fallback_provider()
@@ -146,9 +161,10 @@ class MossRetrievalProvider(RetrievalProvider):
             except Exception as e:
                 self._mark_degraded(e)
                 if not self.allow_fallback:
-                    raise RuntimeError(
+                    raise MossUnavailableError(
                         f"Live Moss index '{index_name}' is not loaded: {e}. "
-                        "MOSS_MOCK_FALLBACK is disabled."
+                        "MOSS_MOCK_FALLBACK is disabled.",
+                        reason=self._degraded_reason or "credit_exhausted",
                     )
                 self._fallback_active = True
                 fallback = self._get_fallback_provider()
@@ -202,8 +218,9 @@ class MossRetrievalProvider(RetrievalProvider):
                     index_name,
                     e,
                 )
-                raise RuntimeError(
-                    f"Live Moss query failed: {e}. MOSS_MOCK_FALLBACK is disabled; silent local fallback is prohibited."
+                raise MossUnavailableError(
+                    f"Live Moss query failed: {e}. MOSS_MOCK_FALLBACK is disabled; silent local fallback is prohibited.",
+                    reason=self._degraded_reason or "credit_exhausted",
                 )
             logger.warning(
                 "Error executing Moss query on index '%s': %s. Routing to local fallback provider.",
@@ -221,9 +238,10 @@ class MossRetrievalProvider(RetrievalProvider):
 
     async def create_index(self, index_name: str, documents: List[Dict[str, Any]]) -> None:
         if self._degraded and not self.allow_fallback:
-            raise RuntimeError(
+            raise MossUnavailableError(
                 f"Cannot create index on live Moss: provider is degraded ({self._degraded_reason}). "
-                "MOSS_MOCK_FALLBACK is false."
+                "MOSS_MOCK_FALLBACK is false.",
+                reason=self._degraded_reason or "credit_exhausted",
             )
         if self._degraded and self.allow_fallback:
             self._fallback_active = True
@@ -264,13 +282,17 @@ class MossRetrievalProvider(RetrievalProvider):
                     index_name,
                     e,
                 )
-                raise
+                raise MossUnavailableError(
+                    f"Could not create live Moss index '{index_name}': {e}. MOSS_MOCK_FALLBACK is false.",
+                    reason=self._degraded_reason or "credit_exhausted",
+                )
 
     async def add_documents(self, index_name: str, documents: List[Dict[str, Any]]) -> None:
         if self._degraded and not self.allow_fallback:
-            raise RuntimeError(
+            raise MossUnavailableError(
                 f"Cannot add documents to live Moss: provider is degraded ({self._degraded_reason}). "
-                "MOSS_MOCK_FALLBACK is false."
+                "MOSS_MOCK_FALLBACK is false.",
+                reason=self._degraded_reason or "credit_exhausted",
             )
         if self._degraded and self.allow_fallback:
             self._fallback_active = True
@@ -310,7 +332,10 @@ class MossRetrievalProvider(RetrievalProvider):
                     index_name,
                     e,
                 )
-                raise
+                raise MossUnavailableError(
+                    f"Could not add documents to live Moss index '{index_name}': {e}. MOSS_MOCK_FALLBACK is false.",
+                    reason=self._degraded_reason or "credit_exhausted",
+                )
 
     def is_connected(self) -> bool:
         """Returns True only when live Moss client is active and not degraded."""

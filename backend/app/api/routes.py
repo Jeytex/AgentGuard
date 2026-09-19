@@ -1,8 +1,19 @@
 import time
 import uuid
-from typing import List, Optional
+from typing import List, Optional, Dict
 from datetime import datetime, timezone
-from fastapi import APIRouter, Response, HTTPException, WebSocket, WebSocketDisconnect, Query, Path
+from fastapi import (
+    APIRouter,
+    Response,
+    Request,
+    HTTPException,
+    WebSocket,
+    WebSocketDisconnect,
+    Query,
+    Path,
+    status,
+)
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from app.config import settings
@@ -44,6 +55,60 @@ class ScenarioRunRequest(BaseModel):
     scenario_id: str
 
 
+def is_moss_degraded_exception(exc: Exception) -> bool:
+    from app.retrieval.moss_client import MossUnavailableError
+
+    if isinstance(exc, MossUnavailableError):
+        return True
+    msg = str(exc).lower()
+    return (
+        "credit_exhausted" in msg
+        or "usage_limit_exceeded" in msg
+        or "moss_mock_fallback is disabled" in msg
+        or "degraded state" in msg
+        or "moss_degraded" in msg
+        or "moss retrieval unavailable" in msg
+    )
+
+
+def make_moss_degraded_response(request: Request, exc: Exception) -> JSONResponse:
+    reason = getattr(exc, "reason", "credit_exhausted")
+    origin = request.headers.get("origin")
+    headers: Dict[str, str] = {}
+    if origin:
+        allowed = settings.CORS_ORIGINS
+        origin_clean = origin.rstrip("/")
+        allowed_clean = (
+            [o.rstrip("/") for o in allowed]
+            if isinstance(allowed, list)
+            else [str(allowed).rstrip("/")]
+        )
+        if "*" in allowed or origin in allowed or origin_clean in allowed_clean:
+            headers["Access-Control-Allow-Origin"] = origin
+            headers["Access-Control-Allow-Credentials"] = "true"
+            headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, HEAD"
+            headers["Access-Control-Allow-Headers"] = "*"
+            headers["Access-Control-Expose-Headers"] = (
+                "X-Moss-Retrieval-Ms, X-Guard-Total-Ms, X-Guard-Verdict"
+            )
+        elif not allowed or allowed == ["*"]:
+            headers["Access-Control-Allow-Origin"] = "*"
+
+    return JSONResponse(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        content={
+            "error": "MOSS_UNAVAILABLE",
+            "code": "MOSS_UNAVAILABLE",
+            "status": "degraded",
+            "reason": reason,
+            "detail": f"Live Moss retrieval engine is unavailable ({reason}). Local fallback is disabled (MOSS_MOCK_FALLBACK=false).",
+            "message": str(exc),
+            "active_mode": "moss_degraded",
+        },
+        headers=headers,
+    )
+
+
 # ==============================================================================
 # 1. Action Guard Evaluation (Hot Path <10ms)
 # ==============================================================================
@@ -51,13 +116,24 @@ class ScenarioRunRequest(BaseModel):
     "/guard/evaluate",
     response_model=ActionEvaluationResponse,
     summary="Evaluate an AI agent action against Moss security policies in <10ms",
+    responses={
+        503: {
+            "description": "Live Moss retrieval engine degraded (credit_exhausted / quota limit)",
+        }
+    },
 )
 async def evaluate_action(
     request: ActionEvaluationRequest,
+    raw_request: Request,
     response: Response,
 ):
     guard = get_guard_engine()
-    result = await guard.evaluate_action(request)
+    try:
+        result = await guard.evaluate_action(request)
+    except Exception as exc:
+        if is_moss_degraded_exception(exc):
+            return make_moss_degraded_response(raw_request, exc)
+        raise
 
     # Set real-time performance headers for transparent latency auditing
     response.headers["X-Moss-Retrieval-Ms"] = str(result.latency.moss_retrieval_ms)
@@ -273,10 +349,23 @@ async def decide_approval(
     "/benchmark",
     response_model=BenchmarkResult,
     summary="Execute side-by-side latency test: In-Process Moss (<10ms) vs Remote Vector DB",
+    responses={
+        503: {
+            "description": "Live Moss retrieval engine degraded (credit_exhausted / quota limit)",
+        }
+    },
 )
-async def run_latency_benchmark(body: BenchmarkRequest = BenchmarkRequest()):
+async def run_latency_benchmark(
+    raw_request: Request,
+    body: BenchmarkRequest = BenchmarkRequest(),
+):
     runner = get_benchmark_runner()
-    return await runner.run_benchmark(iterations=body.iterations, warmup=body.warmup)
+    try:
+        return await runner.run_benchmark(iterations=body.iterations, warmup=body.warmup)
+    except Exception as exc:
+        if is_moss_degraded_exception(exc):
+            return make_moss_degraded_response(raw_request, exc)
+        raise
 
 
 # ==============================================================================
@@ -295,9 +384,15 @@ async def list_simulation_scenarios():
     "/simulator/run",
     response_model=ActionEvaluationResponse,
     summary="Run a simulation scenario and return evaluation result",
+    responses={
+        503: {
+            "description": "Live Moss retrieval engine degraded (credit_exhausted / quota limit)",
+        }
+    },
 )
 async def run_scenario(
     body: ScenarioRunRequest,
+    raw_request: Request,
     response: Response,
 ):
     scenario = get_scenario_by_id(body.scenario_id)
@@ -305,7 +400,12 @@ async def run_scenario(
         raise HTTPException(status_code=404, detail=f"Scenario '{body.scenario_id}' not found.")
 
     guard = get_guard_engine()
-    result = await guard.evaluate_action(scenario.sample_request)
+    try:
+        result = await guard.evaluate_action(scenario.sample_request)
+    except Exception as exc:
+        if is_moss_degraded_exception(exc):
+            return make_moss_degraded_response(raw_request, exc)
+        raise
 
     response.headers["X-Moss-Retrieval-Ms"] = str(result.latency.moss_retrieval_ms)
     response.headers["X-Guard-Total-Ms"] = str(result.latency.total_latency_ms)
