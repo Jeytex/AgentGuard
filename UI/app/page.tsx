@@ -400,7 +400,7 @@ export default function App() {
           onCloseMobile={() => setMobileOpen(false)}
         />
 
-        <main className="grid-bg min-h-[calc(100vh-4rem)] flex-1 overflow-hidden p-4 md:p-8">
+        <main className="grid-bg min-h-[calc(100vh-4rem)] flex-1 overflow-hidden p-3 md:p-5">
           <div className="mx-auto max-w-[1400px]">
             {/* View Title Bar */}
             <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
@@ -408,8 +408,10 @@ export default function App() {
                 <div className="text-[11px] uppercase tracking-wider text-[var(--muted)]">
                   AgentGuard Security Gateway / {view}
                 </div>
-                <h1 className="text-2xl font-bold tracking-tight text-white md:text-3xl mt-0.5">
+                <h1 className="mt-0.5 inline-flex items-center gap-2 text-2xl font-bold tracking-tight text-white md:text-3xl">
+                  <span className="h-3 w-3 rounded-sm border-2 border-[var(--line)] bg-[var(--pink)] shadow-[2px_2px_0_var(--line)]" />
                   {view}
+                  <span className="h-2 w-8 rounded-full bg-[var(--purple)]" />
                 </h1>
               </div>
 

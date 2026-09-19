@@ -39,12 +39,12 @@ export function Header({
           >
             <Menu className="size-5" />
           </button>
-          <div className="flex size-9 items-center justify-center rounded-xl bg-[var(--cyan)] text-black shadow-lg shadow-[var(--cyan)]/10">
+          <div className="flex size-10 items-center justify-center rounded-xl border-2 border-[var(--line)] bg-[var(--cyan)] text-[var(--text)] shadow-[3px_3px_0_var(--line)]">
             <Shield className="size-5" />
           </div>
           <div>
             <div className="font-semibold tracking-tight text-white">
-              Agent<span className="text-[var(--cyan)]">Guard</span>
+              Agent<span className="text-[var(--pink)]">Guard</span>
             </div>
             <div className="hidden text-[10px] uppercase tracking-[.2em] text-[var(--muted)] sm:block">
               Sub-10ms Security & Reliability Layer
@@ -100,7 +100,7 @@ export function Header({
           {/* Quick simulator trigger */}
           <button
             onClick={onOpenSimulator}
-            className="hidden items-center gap-1.5 rounded-lg border border-[var(--cyan)]/40 bg-[var(--cyan)]/10 px-3 py-1.5 text-xs font-medium text-[var(--cyan)] transition hover:bg-[var(--cyan)]/20 md:flex"
+            className="hidden items-center gap-1.5 rounded-lg border-2 border-[var(--line)] bg-[var(--green)] px-3 py-1.5 text-xs font-bold text-[var(--text)] shadow-[2px_2px_0_var(--line)] transition hover:bg-[var(--cyan)]/20 md:flex"
           >
             Simulator
           </button>
