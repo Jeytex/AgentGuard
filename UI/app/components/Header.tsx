@@ -31,7 +31,7 @@ export function Header({
 
   return (
     <>
-      <header className="flex h-16 items-center justify-between border-b border-[var(--line)] px-4 md:px-6">
+      <header className="retro-window flex h-16 items-center justify-between border-b-2 border-[var(--line)] bg-[var(--panel)] px-4 md:px-6">
         <div className="flex items-center gap-3">
           <button
             onClick={onToggleMobile}

@@ -9,7 +9,7 @@ export const Card = React.memo(function Card({
 }) {
   return (
     <section
-      className={`rounded-xl border border-[var(--line)] bg-[var(--panel)] transition-all ${className}`}
+      className={`retro-window rounded-2xl border-2 border-[var(--line)] bg-[var(--panel)] transition-all ${className}`}
     >
       {children}
     </section>

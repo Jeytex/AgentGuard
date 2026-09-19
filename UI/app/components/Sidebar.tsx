@@ -55,7 +55,7 @@ export function Sidebar({
     <aside
       className={`${
         mobileOpen ? 'block' : 'hidden'
-      } absolute inset-y-16 z-20 w-64 border-r border-[var(--line)] bg-[var(--panel)] p-3 md:static md:block`}
+      } absolute inset-y-16 z-20 w-64 border-r-2 border-[var(--line)] bg-[var(--panel)] p-3 md:static md:block`}
     >
       <div className="mb-4 px-3 pt-3 text-[10px] font-bold uppercase tracking-[.2em] text-[var(--muted)]">
         Control Center
