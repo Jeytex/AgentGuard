@@ -61,7 +61,7 @@ export function OverviewView({
           aria-label="View all interceptions and audit decisions"
           className="metric-card w-full border-0 p-0 text-left rounded-xl shadow-none focus:outline-none focus:ring-2 focus:ring-[var(--cyan)]/40"
         >
-          <Card className="p-5 transition hover:border-[var(--cyan)]/40 hover:bg-white/[0.02]">
+          <Card className="metric-surface p-5 transition hover:border-[var(--cyan)]/40 hover:bg-white/[0.02]">
             <div className="flex items-start justify-between">
               <div>
                 <div className="text-xs font-medium text-[var(--muted)]">Total Decisions</div>
@@ -81,7 +81,7 @@ export function OverviewView({
           aria-label="View allow rate details in interceptions"
           className="metric-card w-full border-0 p-0 text-left rounded-xl shadow-none focus:outline-none focus:ring-2 focus:ring-[var(--green)]/40"
         >
-          <Card className="p-5 transition hover:border-[var(--green)]/40 hover:bg-white/[0.02]">
+          <Card className="metric-surface p-5 transition hover:border-[var(--green)]/40 hover:bg-white/[0.02]">
             <div className="flex items-start justify-between">
               <div>
                 <div className="text-xs font-medium text-[var(--muted)]">Allow Rate</div>
@@ -103,7 +103,7 @@ export function OverviewView({
           aria-label="View telemetry and P95 latency benchmarks"
           className="metric-card w-full border-0 p-0 text-left rounded-xl shadow-none focus:outline-none focus:ring-2 focus:ring-purple-400/40"
         >
-          <Card className="p-5 transition hover:border-purple-400/40 hover:bg-white/[0.02]">
+          <Card className="metric-surface p-5 transition hover:border-purple-400/40 hover:bg-white/[0.02]">
             <div className="flex items-start justify-between">
               <div>
                 <div className="text-xs font-medium text-[var(--muted)]">P95 Pipeline Latency</div>
@@ -125,7 +125,7 @@ export function OverviewView({
           aria-label="View active security policies indexed in Moss"
           className="metric-card w-full border-0 p-0 text-left rounded-xl shadow-none focus:outline-none focus:ring-2 focus:ring-[var(--cyan)]/40"
         >
-          <Card className="p-5 transition hover:border-[var(--cyan)]/40 hover:bg-white/[0.02]">
+          <Card className="metric-surface p-5 transition hover:border-[var(--cyan)]/40 hover:bg-white/[0.02]">
             <div className="flex items-start justify-between">
               <div>
                 <div className="text-xs font-medium text-[var(--muted)]">Policies Indexed in Moss</div>
