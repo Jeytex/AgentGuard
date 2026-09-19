@@ -40,44 +40,32 @@ function ToastItem({
   const isError = toast.type === 'error';
   const isWarning = toast.type === 'warning';
 
-  const borderColor = isSuccess
-    ? '#62d99a44'
+  const iconBg = isSuccess
+    ? 'bg-[var(--green)] text-[#26541b]'
     : isError
-      ? '#ff6d7a44'
+      ? 'bg-[var(--red)] text-[#8a1936]'
       : isWarning
-        ? '#f59e0b44'
-        : '#56d8e444';
-  const bgColor = isSuccess
-    ? '#0d1d16'
-    : isError
-      ? '#230f12'
-      : isWarning
-        ? '#231b0f'
-        : '#0e1a1f';
+        ? 'bg-[var(--amber)] text-[#6d4508]'
+        : 'bg-[var(--cyan)] text-[#134e56]';
   const Icon = isSuccess ? CheckCircle2 : AlertTriangle;
-  const iconColor = isSuccess
-    ? '#62d99a'
-    : isError
-      ? '#ff6d7a'
-      : isWarning
-        ? '#f59e0b'
-        : '#56d8e4';
 
   return (
     <div
-      style={{ borderColor, backgroundColor: bgColor }}
-      className="flex min-w-[300px] max-w-md items-start gap-3 rounded-xl border p-4 shadow-xl backdrop-blur"
+      className="flex min-w-[320px] max-w-md items-start gap-3 rounded-2xl border-2 border-[var(--line)] bg-[#fffdfa] p-4 text-[var(--text)] shadow-[4px_4px_0_var(--line)]"
     >
-      <Icon style={{ color: iconColor }} className="mt-0.5 size-4 shrink-0" />
+      <div className={`mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg border-2 border-[var(--line)] ${iconBg}`}>
+        <Icon className="size-4" />
+      </div>
       <div className="min-w-0 flex-1">
-        <div className="text-xs font-semibold text-white">{toast.title}</div>
+        <div className="text-xs font-bold text-[var(--text)]">{toast.title}</div>
         {toast.detail && (
-          <div className="mt-0.5 truncate text-[11px] text-[var(--muted)]">{toast.detail}</div>
+          <div className="mt-0.5 text-[11px] font-medium text-[var(--muted)] leading-relaxed">{toast.detail}</div>
         )}
       </div>
       <button
         onClick={onDismiss}
-        className="rounded p-1 text-[var(--muted)] hover:bg-white/5 hover:text-white"
+        aria-label="Dismiss notification"
+        className="rounded-lg p-1 text-[var(--text)] transition hover:bg-[var(--line)]/10 cursor-pointer"
       >
         <X className="size-3.5" />
       </button>

@@ -42,33 +42,33 @@ export function AuditView({ interceptions, loading, onOpenItem }: AuditViewProps
   return (
     <Card>
       {/* Header */}
-      <div className="flex flex-col gap-4 border-b border-[var(--line)] p-5 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-4 border-b-2 border-[var(--line)] p-5 md:flex-row md:items-center md:justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-base font-semibold text-white">Immutable Security Audit Trail</h2>
-            <span className="rounded-full bg-white/5 px-2.5 py-0.5 text-xs font-mono text-[var(--cyan)]">
+            <h2 className="text-base font-bold text-[var(--text)]">Immutable Security Audit Trail</h2>
+            <span className="rounded-full border border-[var(--line)] bg-[var(--cyan)]/25 px-2.5 py-0.5 text-xs font-bold text-[#134e56]">
               {interceptions.length} recorded
             </span>
           </div>
-          <p className="mt-0.5 text-xs text-[var(--muted)]">
+          <p className="mt-0.5 text-xs font-medium text-[var(--muted)]">
             Chronological log of agent actions, fast-path decisions, and human supervisor interventions
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative">
-            <Search className="absolute left-3 top-2.5 size-3.5 text-[var(--muted)]" />
+            <Search className="absolute left-3 top-2.5 size-3.5 text-[var(--text)]" />
             <input
               type="text"
               placeholder="Filter audit entries..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-52 rounded-xl border border-[var(--line)] bg-black/40 pl-9 pr-8 py-1.5 text-xs text-white outline-none focus:border-[var(--cyan)]"
+              className="w-52 rounded-xl border-2 border-[var(--line)] bg-[#fffdfa] pl-9 pr-8 py-1.5 text-xs font-medium text-[var(--text)] outline-none shadow-[2px_2px_0_var(--line)] focus:ring-2 focus:ring-[var(--cyan)]/40"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-2.5 text-[var(--muted)] hover:text-white"
+                className="absolute right-2.5 top-2.5 text-[var(--text)] hover:opacity-75"
                 title="Clear search"
               >
                 <X className="size-3" />
@@ -76,13 +76,13 @@ export function AuditView({ interceptions, loading, onOpenItem }: AuditViewProps
             )}
           </div>
 
-          <div className="flex rounded-xl border border-[var(--line)] bg-black/20 p-0.5 text-xs">
+          <div className="flex rounded-xl border-2 border-[var(--line)] bg-[var(--panel2)] p-0.5 text-xs shadow-[2px_2px_0_var(--line)]">
             {['all', 'ALLOW', 'BLOCK', 'REQUIRE_APPROVAL'].map((v) => (
               <button
                 key={v}
                 onClick={() => setSelectedVerdict(v)}
-                className={`rounded-lg px-2.5 py-1 text-[11px] font-medium transition ${
-                  selectedVerdict === v ? 'bg-white/10 text-white shadow' : 'text-[var(--muted)] hover:text-white'
+                className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition cursor-pointer ${
+                  selectedVerdict === v ? 'border-2 border-[var(--line)] bg-white text-[var(--text)] shadow-[2px_2px_0_var(--line)]' : 'text-[var(--text)] hover:bg-white/50'
                 }`}
               >
                 {v === 'REQUIRE_APPROVAL' ? 'APPROVAL' : v}
@@ -93,7 +93,7 @@ export function AuditView({ interceptions, loading, onOpenItem }: AuditViewProps
           <button
             onClick={exportJson}
             disabled={filtered.length === 0}
-            className="flex items-center gap-1.5 rounded-xl border border-[var(--line)] bg-[var(--panel)] px-3 py-1.5 text-xs font-medium text-[var(--muted)] transition hover:bg-white/5 hover:text-white disabled:opacity-40"
+            className="flex items-center gap-1.5 rounded-xl border-2 border-[var(--line)] bg-[var(--panel2)] px-3 py-1.5 text-xs font-bold text-[var(--text)] shadow-[2px_2px_0_var(--line)] transition hover:opacity-90 disabled:opacity-40 cursor-pointer"
           >
             <Download className="size-3.5" /> Export JSON
           </button>
@@ -122,17 +122,17 @@ export function AuditView({ interceptions, loading, onOpenItem }: AuditViewProps
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="border-b border-[var(--line)] bg-white/[0.01] text-[10px] uppercase tracking-wider text-[var(--muted)]">
-                <th className="px-5 py-3 font-semibold">Timestamp</th>
-                <th className="px-5 py-3 font-semibold">Action ID</th>
-                <th className="px-5 py-3 font-semibold">Agent / Role</th>
-                <th className="px-5 py-3 font-semibold">Tool Execution</th>
-                <th className="px-5 py-3 font-semibold">Verdict</th>
-                <th className="px-5 py-3 font-semibold">Latency</th>
-                <th className="px-5 py-3 font-semibold text-right">Details</th>
+              <tr className="border-b-2 border-[var(--line)] bg-[var(--panel2)]/40 text-[10px] uppercase font-bold tracking-wider text-[var(--text)]">
+                <th className="px-5 py-3 font-bold">Timestamp</th>
+                <th className="px-5 py-3 font-bold">Action ID</th>
+                <th className="px-5 py-3 font-bold">Agent / Role</th>
+                <th className="px-5 py-3 font-bold">Tool Execution</th>
+                <th className="px-5 py-3 font-bold">Verdict</th>
+                <th className="px-5 py-3 font-bold">Latency</th>
+                <th className="px-5 py-3 font-bold text-right">Details</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[var(--line)]">
+            <tbody className="divide-y-2 divide-[var(--line)]">
               {filtered.map((item) => {
                 const date = new Date(item.timestamp);
                 const timeStr = isNaN(date.getTime())
@@ -143,21 +143,21 @@ export function AuditView({ interceptions, loading, onOpenItem }: AuditViewProps
                   <tr
                     key={item.action_id}
                     onClick={() => onOpenItem(item)}
-                    className="cursor-pointer transition hover:bg-white/[0.02]"
+                    className="cursor-pointer transition hover:bg-[var(--cyan)]/10"
                   >
-                    <td className="whitespace-nowrap px-5 py-3.5 font-mono text-[11px] text-[var(--muted)]">
+                    <td className="whitespace-nowrap px-5 py-3.5 font-mono text-[11px] font-medium text-[var(--muted)]">
                       {timeStr}
                     </td>
-                    <td className="whitespace-nowrap px-5 py-3.5 font-mono text-[11px] text-[var(--cyan)]">
+                    <td className="whitespace-nowrap px-5 py-3.5 font-mono text-[11px] font-bold text-[#134e56]">
                       {item.action_id.slice(0, 16)}...
                     </td>
                     <td className="px-5 py-3.5">
-                      <div className="font-semibold text-white">{item.agent_id}</div>
-                      <div className="text-[10px] text-[var(--muted)]">{item.agent_role}</div>
+                      <div className="font-bold text-[var(--text)]">{item.agent_id}</div>
+                      <div className="text-[10px] font-medium text-[var(--muted)]">{item.agent_role}</div>
                     </td>
                     <td className="px-5 py-3.5">
-                      <div className="font-mono text-xs text-white">{item.tool_name}</div>
-                      <div className="truncate max-w-xs text-[11px] text-[var(--muted)]">
+                      <div className="font-mono text-xs font-bold text-[var(--text)]">{item.tool_name}</div>
+                      <div className="truncate max-w-xs text-[11px] font-medium text-[var(--muted)]">
                         {item.reason}
                       </div>
                     </td>
@@ -168,15 +168,15 @@ export function AuditView({ interceptions, loading, onOpenItem }: AuditViewProps
                       </div>
                     </td>
                     <td className="whitespace-nowrap px-5 py-3.5 font-mono text-[11px]">
-                      <div className="text-white font-medium">
+                      <div className="text-[var(--text)] font-bold">
                         {item.latency?.total_latency_ms.toFixed(1)} ms
                       </div>
-                      <div className="text-[10px] text-[var(--muted)]">
+                      <div className="text-[10px] font-bold text-[var(--muted)]">
                         Moss: {item.latency?.moss_retrieval_ms.toFixed(1)}ms
                       </div>
                     </td>
                     <td className="whitespace-nowrap px-5 py-3.5 text-right">
-                      <ChevronRight className="inline-block size-4 text-[var(--muted)]" />
+                      <ChevronRight className="inline-block size-4 text-[var(--text)]" />
                     </td>
                   </tr>
                 );

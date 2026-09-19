@@ -85,22 +85,22 @@ export function CreatePolicyModal({ isOpen, onClose, onSubmit }: CreatePolicyMod
         aria-modal="true"
         aria-labelledby="create-policy-title"
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg rounded-2xl border border-[var(--line)] bg-[#0e1115] p-6 shadow-2xl"
+        className="retro-window w-full max-w-lg rounded-2xl border-2 border-[var(--line)] bg-[var(--panel)] p-6 shadow-[6px_6px_0_var(--line)] text-[var(--text)]"
       >
-        <div className="flex items-center justify-between border-b border-[var(--line)] pb-4">
+        <div className="flex items-center justify-between border-b-2 border-[var(--line)] pb-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex size-8 items-center justify-center rounded-lg bg-[var(--cyan)]/15 text-[var(--cyan)]">
+            <div className="flex size-9 items-center justify-center rounded-xl border-2 border-[var(--line)] bg-[var(--cyan)] text-[var(--text)] shadow-[2px_2px_0_var(--line)]">
               <BookOpen className="size-4" />
             </div>
             <div>
-              <h3 id="create-policy-title" className="font-semibold text-white">Create Security Policy</h3>
+              <h3 id="create-policy-title" className="font-bold text-base text-[var(--text)]">Create Security Policy</h3>
               <p className="text-xs text-[var(--muted)]">Dynamically indexes into Moss in-process memory</p>
             </div>
           </div>
           <button
             onClick={onClose}
             aria-label="Close dialog"
-            className="rounded-lg p-1.5 text-[var(--muted)] hover:bg-white/5 hover:text-white"
+            className="rounded-lg p-1.5 text-[var(--text)] hover:bg-[var(--cyan)]/20"
           >
             <X className="size-4" />
           </button>
@@ -108,13 +108,13 @@ export function CreatePolicyModal({ isOpen, onClose, onSubmit }: CreatePolicyMod
 
         <form onSubmit={handleSubmit} className="mt-4 space-y-4 text-xs">
           {error && (
-            <div className="rounded-lg border border-[#ff6d7a44] bg-[#ff6d7a12] p-3 text-[#ff6d7a]">
+            <div className="rounded-xl border-2 border-[var(--red)] bg-[var(--red)]/15 p-3 font-medium text-[#8a1936]">
               {error}
             </div>
           )}
 
           <div>
-            <label className="block font-medium uppercase tracking-wider text-[var(--muted)]">
+            <label className="block font-bold uppercase tracking-wider text-[var(--text)]">
               Policy Name
             </label>
             <input
@@ -122,19 +122,19 @@ export function CreatePolicyModal({ isOpen, onClose, onSubmit }: CreatePolicyMod
               placeholder="e.g. Prohibit Unfiltered Database Deletes"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-[var(--line)] bg-black/40 px-3 py-2 text-white outline-none focus:border-[var(--cyan)]"
+              className="mt-1 w-full rounded-xl border-2 border-[var(--line)] bg-[#fffdfa] px-3 py-2 text-[var(--text)] outline-none focus:ring-2 focus:ring-[var(--cyan)]/40"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block font-medium uppercase tracking-wider text-[var(--muted)]">
+              <label className="block font-bold uppercase tracking-wider text-[var(--text)]">
                 Category
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as PolicyCategory)}
-                className="mt-1 w-full rounded-lg border border-[var(--line)] bg-black/40 px-3 py-2 text-white outline-none focus:border-[var(--cyan)]"
+                className="mt-1 w-full rounded-xl border-2 border-[var(--line)] bg-[#fffdfa] px-3 py-2 text-[var(--text)] outline-none focus:ring-2 focus:ring-[var(--cyan)]/40"
               >
                 <option value="financial">Financial</option>
                 <option value="destructive">Destructive</option>
@@ -145,13 +145,13 @@ export function CreatePolicyModal({ isOpen, onClose, onSubmit }: CreatePolicyMod
             </div>
 
             <div>
-              <label className="block font-medium uppercase tracking-wider text-[var(--muted)]">
+              <label className="block font-bold uppercase tracking-wider text-[var(--text)]">
                 Enforcement
               </label>
               <select
                 value={enforcement}
                 onChange={(e) => setEnforcement(e.target.value as GuardVerdict)}
-                className="mt-1 w-full rounded-lg border border-[var(--line)] bg-black/40 px-3 py-2 text-white outline-none focus:border-[var(--cyan)]"
+                className="mt-1 w-full rounded-xl border-2 border-[var(--line)] bg-[#fffdfa] px-3 py-2 text-[var(--text)] outline-none focus:ring-2 focus:ring-[var(--cyan)]/40"
               >
                 <option value="BLOCK">BLOCK</option>
                 <option value="REQUIRE_APPROVAL">REQUIRE_APPROVAL</option>
@@ -162,13 +162,13 @@ export function CreatePolicyModal({ isOpen, onClose, onSubmit }: CreatePolicyMod
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block font-medium uppercase tracking-wider text-[var(--muted)]">
+              <label className="block font-bold uppercase tracking-wider text-[var(--text)]">
                 Risk Level
               </label>
               <select
                 value={riskLevel}
                 onChange={(e) => setRiskLevel(e.target.value as RiskLevel)}
-                className="mt-1 w-full rounded-lg border border-[var(--line)] bg-black/40 px-3 py-2 text-white outline-none focus:border-[var(--cyan)]"
+                className="mt-1 w-full rounded-xl border-2 border-[var(--line)] bg-[#fffdfa] px-3 py-2 text-[var(--text)] outline-none focus:ring-2 focus:ring-[var(--cyan)]/40"
               >
                 <option value="CRITICAL">CRITICAL</option>
                 <option value="HIGH">HIGH</option>
@@ -178,7 +178,7 @@ export function CreatePolicyModal({ isOpen, onClose, onSubmit }: CreatePolicyMod
             </div>
 
             <div>
-              <label className="block font-medium uppercase tracking-wider text-[var(--muted)]">
+              <label className="block font-bold uppercase tracking-wider text-[var(--text)]">
                 Target Tools (comma-separated)
               </label>
               <input
@@ -186,13 +186,13 @@ export function CreatePolicyModal({ isOpen, onClose, onSubmit }: CreatePolicyMod
                 placeholder="e.g. postgres.*, stripe_*"
                 value={toolsStr}
                 onChange={(e) => setToolsStr(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-[var(--line)] bg-black/40 px-3 py-2 text-white outline-none focus:border-[var(--cyan)]"
+                className="mt-1 w-full rounded-xl border-2 border-[var(--line)] bg-[#fffdfa] px-3 py-2 text-[var(--text)] outline-none focus:ring-2 focus:ring-[var(--cyan)]/40"
               />
             </div>
           </div>
 
           <div>
-            <label className="block font-medium uppercase tracking-wider text-[var(--muted)]">
+            <label className="block font-bold uppercase tracking-wider text-[var(--text)]">
               Rule Statement (Natural Language)
             </label>
             <textarea
@@ -200,12 +200,12 @@ export function CreatePolicyModal({ isOpen, onClose, onSubmit }: CreatePolicyMod
               placeholder="e.g. Prohibit DROP, TRUNCATE, and DELETE without a WHERE clause."
               value={ruleText}
               onChange={(e) => setRuleText(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-[var(--line)] bg-black/40 px-3 py-2 text-white outline-none focus:border-[var(--cyan)]"
+              className="mt-1 w-full rounded-xl border-2 border-[var(--line)] bg-[#fffdfa] px-3 py-2 text-[var(--text)] outline-none focus:ring-2 focus:ring-[var(--cyan)]/40"
             />
           </div>
 
           <div>
-            <label className="block font-medium uppercase tracking-wider text-[var(--muted)]">
+            <label className="block font-bold uppercase tracking-wider text-[var(--text)]">
               Conditions JSON (Optional)
             </label>
             <input
@@ -213,7 +213,7 @@ export function CreatePolicyModal({ isOpen, onClose, onSubmit }: CreatePolicyMod
               placeholder='{"max_amount": 1000, "blocked_keywords": ["drop"]}'
               value={conditionsJson}
               onChange={(e) => setConditionsJson(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-[var(--line)] bg-black/40 px-3 py-2 font-mono text-white outline-none focus:border-[var(--cyan)]"
+              className="mt-1 w-full rounded-xl border-2 border-[var(--line)] bg-[#fffdfa] px-3 py-2 font-mono text-[var(--text)] outline-none focus:ring-2 focus:ring-[var(--cyan)]/40"
             />
           </div>
 
@@ -221,14 +221,14 @@ export function CreatePolicyModal({ isOpen, onClose, onSubmit }: CreatePolicyMod
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg border border-[var(--line)] px-4 py-2 text-[var(--muted)] hover:bg-white/5 hover:text-white"
+              className="rounded-xl border-2 border-[var(--line)] bg-[var(--panel2)] px-4 py-2 font-bold text-[var(--text)] shadow-[2px_2px_0_var(--line)] transition hover:opacity-90 cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="flex items-center gap-2 rounded-lg bg-[var(--cyan)] px-4 py-2 font-semibold text-black hover:opacity-90 disabled:opacity-50"
+              className="flex items-center gap-2 rounded-xl border-2 border-[var(--line)] bg-[var(--cyan)] px-4 py-2 font-bold text-[var(--text)] shadow-[2px_2px_0_var(--line)] transition hover:opacity-90 disabled:opacity-50 cursor-pointer"
             >
               {submitting ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
               Save & Index Policy

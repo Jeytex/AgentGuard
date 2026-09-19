@@ -71,16 +71,16 @@ export function Sidebar({
                 onSelectView(name);
                 onCloseMobile();
               }}
-              className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-medium transition ${
+              className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-bold transition ${
                 isActive
                   ? 'bg-[var(--pink)] text-[var(--text)] shadow-[3px_3px_0_var(--line)] border-2 border-[var(--line)]'
                   : 'text-[var(--text)] hover:bg-[var(--cyan)]/60 hover:text-[var(--text)]'
               }`}
             >
-              <Icon className={`size-4 ${isActive ? 'text-[var(--cyan)]' : ''}`} />
+              <Icon className="size-4 text-[var(--text)]" />
               <span className="truncate">{name}</span>
               {name === 'Approvals' && pendingCount > 0 && (
-                <span className="ml-auto rounded-full bg-[#e7b96b]/20 px-2 py-0.5 text-[10px] font-bold text-[#e7b96b]">
+                <span className="ml-auto rounded-full border border-[var(--line)] bg-[var(--amber)] px-2 py-0.5 text-[10px] font-bold text-[#6d4508]">
                   {pendingCount}
                 </span>
               )}
@@ -89,22 +89,22 @@ export function Sidebar({
         })}
       </nav>
 
-      <div className="mt-8 border-t border-[var(--line)] pt-4">
-        <div className="px-3 text-[10px] uppercase tracking-[.2em] text-[var(--muted)]">
+      <div className="mt-8 border-t-2 border-[var(--line)] pt-4">
+        <div className="px-3 text-[10px] font-bold uppercase tracking-[.2em] text-[var(--muted)]">
           Moss Engine Status
         </div>
-        <div className="mt-3 rounded-xl bg-white/[0.03] p-3 text-xs border border-[var(--line)]">
+        <div className="mt-3 rounded-xl border-2 border-[var(--line)] bg-[#fffdfa] p-3 text-xs shadow-[2px_2px_0_var(--line)]">
           <div className="flex items-center gap-2">
             <span
-              className={`size-2 rounded-full ${
+              className={`size-2.5 rounded-full ${
                 health?.moss_connected
-                  ? 'bg-[var(--green)]'
+                  ? 'bg-[#26541b]'
                   : health?.active_mode === 'moss_degraded'
-                  ? 'bg-[#ff6d7a]'
-                  : 'bg-[#e7b96b]'
+                  ? 'bg-[#8a1936]'
+                  : 'bg-[#6d4508]'
               }`}
             />
-            <span className="font-semibold text-white">
+            <span className="font-bold text-[var(--text)]">
               {health?.moss_connected
                 ? 'Moss In-Process'
                 : health?.active_mode === 'degraded_local'
@@ -116,12 +116,12 @@ export function Sidebar({
                 : 'Connecting Engine'}
             </span>
           </div>
-          <div className="mt-1 text-[11px] text-[var(--muted)]">
-            Mode: <span className="font-mono text-white">{health?.active_mode || 'checking...'}</span>
+          <div className="mt-1.5 text-[11px] font-medium text-[var(--muted)]">
+            Mode: <span className="font-mono font-bold text-[var(--text)]">{health?.active_mode || 'checking...'}</span>
           </div>
-          <div className="mt-1 flex items-center justify-between text-[11px] text-[var(--muted)]">
+          <div className="mt-1 flex items-center justify-between text-[11px] font-medium text-[var(--muted)]">
             <span>Policies Indexed:</span>
-            <span className="font-mono text-[var(--cyan)] font-semibold">
+            <span className="font-mono font-bold text-[#134e56]">
               {health?.total_policies_indexed ?? '—'}
             </span>
           </div>

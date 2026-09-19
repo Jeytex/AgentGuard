@@ -120,35 +120,35 @@ export function ActionDetailDrawer({ item, onClose, onDecide }: ActionDetailDraw
         aria-modal="true"
         aria-labelledby="action-detail-title"
         onClick={(e) => e.stopPropagation()}
-        className="scrollbar flex h-full w-full max-w-2xl flex-col border-l border-[var(--line)] bg-[#0b0e12] p-6 shadow-2xl overflow-y-auto"
+        className="scrollbar flex h-full w-full max-w-2xl flex-col border-l-2 border-[var(--line)] bg-[var(--panel)] p-6 shadow-2xl overflow-y-auto text-[var(--text)]"
       >
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-[var(--line)] pb-5">
+        <div className="flex items-start justify-between border-b-2 border-[var(--line)] pb-5">
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.2em] text-[var(--muted)]">
-              <ShieldAlert className="size-3 text-[var(--cyan)]" /> Action Inspection
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.2em] text-[var(--text)]">
+              <ShieldAlert className="size-3.5 text-[#134e56]" /> Action Inspection
             </div>
-            <h2 id="action-detail-title" className="mt-1.5 truncate text-xl font-semibold text-white">{toolName}</h2>
+            <h2 id="action-detail-title" className="mt-1.5 truncate text-xl font-bold text-[var(--text)]">{toolName}</h2>
             <div className="mt-1 flex flex-wrap items-center gap-2 font-mono text-xs text-[var(--muted)]">
               <span>{actionId}</span>
               <span>•</span>
-              <span className="text-[var(--cyan)]">{agentId}</span>
+              <span className="font-bold text-[#134e56]">{agentId}</span>
               <span>({agentRole})</span>
             </div>
           </div>
           <button
             onClick={onClose}
             aria-label="Close inspection drawer"
-            className="rounded-lg p-2 text-[var(--muted)] transition hover:bg-white/5 hover:text-white"
+            className="rounded-lg p-2 text-[var(--text)] transition hover:bg-[var(--cyan)]/20"
           >
             <X className="size-5" />
           </button>
         </div>
 
         {/* Security Verdict & Risk Bar */}
-        <div className="mt-5 grid grid-cols-2 gap-4 rounded-xl border border-[var(--line)] bg-[var(--panel)] p-4">
+        <div className="mt-5 grid grid-cols-2 gap-4 rounded-2xl border-2 border-[var(--line)] bg-[#fffdfa] p-4 shadow-[2px_2px_0_var(--line)]">
           <div>
-            <div className="text-[11px] text-[var(--muted)] uppercase tracking-wider font-medium">
+            <div className="text-[11px] text-[var(--text)] uppercase tracking-wider font-bold">
               Security Verdict
             </div>
             <div className="mt-2 flex items-center gap-2">
@@ -156,14 +156,14 @@ export function ActionDetailDrawer({ item, onClose, onDecide }: ActionDetailDraw
                 {verdict}
               </Badge>
               {isResolved && item.status && (
-                <span className="text-[11px] font-mono text-[var(--muted)]">
+                <span className="text-[11px] font-mono font-medium text-[var(--muted)]">
                   (Resolved: {item.status})
                 </span>
               )}
             </div>
           </div>
           <div className="text-right">
-            <div className="text-[11px] text-[var(--muted)] uppercase tracking-wider font-medium">
+            <div className="text-[11px] text-[var(--text)] uppercase tracking-wider font-bold">
               Threat Risk Level
             </div>
             <div className="mt-2 flex items-center justify-end gap-2">
@@ -174,11 +174,11 @@ export function ActionDetailDrawer({ item, onClose, onDecide }: ActionDetailDraw
         </div>
 
         {/* Reason / Explanation */}
-        <div className="mt-5 rounded-xl border border-[var(--line)] bg-[var(--panel)] p-4">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
-            <FileText className="size-3.5 text-[var(--cyan)]" /> Decision Rationale
+        <div className="mt-5 rounded-2xl border-2 border-[var(--line)] bg-[#fffdfa] p-4 shadow-[2px_2px_0_var(--line)]">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[var(--text)]">
+            <FileText className="size-3.5 text-[#134e56]" /> Decision Rationale
           </div>
-          <p className="mt-2 text-sm leading-relaxed text-[#e1e7ed]">
+          <p className="mt-2 text-sm leading-relaxed text-[var(--text)] font-medium">
             {item.reason || 'Action verified compliant with all security policies.'}
           </p>
         </div>
@@ -186,25 +186,25 @@ export function ActionDetailDrawer({ item, onClose, onDecide }: ActionDetailDraw
         {/* Latency Breakdown */}
         {latency && (
           <div className="mt-5">
-            <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
-              <Clock3 className="size-3.5 text-[var(--cyan)]" /> Sub-10ms Latency Breakdown
+            <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[var(--text)]">
+              <Clock3 className="size-3.5 text-[#134e56]" /> Sub-10ms Latency Breakdown
             </div>
             <div className="grid grid-cols-3 gap-3">
-              <div className="rounded-xl border border-[var(--line)] bg-white/[0.02] p-3 text-center">
-                <div className="text-[10px] text-[var(--muted)]">Moss Retrieval</div>
-                <div className="mt-1 font-mono text-base font-semibold text-[var(--cyan)]">
+              <div className="rounded-xl border-2 border-[var(--line)] bg-[#fffdfa] p-3 text-center shadow-[2px_2px_0_var(--line)]">
+                <div className="text-[10px] font-bold text-[var(--muted)]">Moss Retrieval</div>
+                <div className="mt-1 font-mono text-base font-bold text-[#134e56]">
                   {latency.moss_retrieval_ms?.toFixed(2) ?? '0.00'} ms
                 </div>
               </div>
-              <div className="rounded-xl border border-[var(--line)] bg-white/[0.02] p-3 text-center">
-                <div className="text-[10px] text-[var(--muted)]">Rule Evaluation</div>
-                <div className="mt-1 font-mono text-base font-semibold text-[var(--green)]">
+              <div className="rounded-xl border-2 border-[var(--line)] bg-[#fffdfa] p-3 text-center shadow-[2px_2px_0_var(--line)]">
+                <div className="text-[10px] font-bold text-[var(--muted)]">Rule Evaluation</div>
+                <div className="mt-1 font-mono text-base font-bold text-[#26541b]">
                   {latency.rule_evaluation_ms?.toFixed(2) ?? '0.00'} ms
                 </div>
               </div>
-              <div className="rounded-xl border border-[var(--line)] bg-white/[0.02] p-3 text-center">
-                <div className="text-[10px] text-[var(--muted)]">Total Pipeline</div>
-                <div className="mt-1 font-mono text-base font-semibold text-white">
+              <div className="rounded-xl border-2 border-[var(--line)] bg-[#fffdfa] p-3 text-center shadow-[2px_2px_0_var(--line)]">
+                <div className="text-[10px] font-bold text-[var(--muted)]">Total Pipeline</div>
+                <div className="mt-1 font-mono text-base font-bold text-[var(--text)]">
                   {latency.total_latency_ms?.toFixed(2) ?? '0.00'} ms
                 </div>
               </div>
@@ -215,27 +215,27 @@ export function ActionDetailDrawer({ item, onClose, onDecide }: ActionDetailDraw
         {/* Matched Policies */}
         {matchedPolicies.length > 0 && (
           <div className="mt-5">
-            <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
-              <Cpu className="size-3.5 text-[var(--cyan)]" /> Matched Security Policies ({matchedPolicies.length})
+            <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[var(--text)]">
+              <Cpu className="size-3.5 text-[#134e56]" /> Matched Security Policies ({matchedPolicies.length})
             </div>
             <div className="space-y-2">
               {matchedPolicies.map((p: MatchedPolicy, idx: number) => (
                 <div
                   key={idx}
-                  className="rounded-xl border border-[var(--line)] bg-white/[0.02] p-3.5 text-xs"
+                  className="rounded-xl border-2 border-[var(--line)] bg-[#fffdfa] p-3.5 text-xs shadow-[2px_2px_0_var(--line)]"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-[var(--cyan)]">{p.policy_id}</span>
+                    <span className="font-mono font-bold text-[#134e56]">{p.policy_id}</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-[var(--muted)]">
+                      <span className="text-[10px] font-bold text-[var(--muted)]">
                         Match: {Math.round(p.score * 100)}%
                       </span>
                       <Badge kind={p.enforcement}>{p.enforcement}</Badge>
                     </div>
                   </div>
-                  <p className="mt-2 font-medium text-white">{p.rule_text}</p>
+                  <p className="mt-2 font-semibold text-[var(--text)]">{p.rule_text}</p>
                   {p.reason && (
-                    <div className="mt-1.5 text-[11px] text-[var(--muted)]">
+                    <div className="mt-1.5 text-[11px] font-medium text-[#8a1936]">
                       Violation: {p.reason}
                     </div>
                   )}
@@ -247,32 +247,32 @@ export function ActionDetailDrawer({ item, onClose, onDecide }: ActionDetailDraw
 
         {/* Parameters */}
         <div className="mt-5">
-          <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
-            <Terminal className="size-3.5 text-[var(--cyan)]" /> Tool Parameters
+          <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[var(--text)]">
+            <Terminal className="size-3.5 text-[#134e56]" /> Tool Parameters
           </div>
-          <pre className="scrollbar max-h-52 overflow-auto rounded-xl border border-[var(--line)] bg-black/40 p-4 font-mono text-xs leading-5 text-[#9cb1c9]">
+          <pre className="scrollbar max-h-52 overflow-auto rounded-xl border-2 border-[var(--line)] bg-[#221c27] p-4 font-mono text-xs leading-5 text-[#f7f2e8] shadow-[2px_2px_0_var(--line)]">
             {JSON.stringify(item.parameters || {}, null, 2)}
           </pre>
         </div>
 
         {/* Already Resolved Summary */}
         {(item.status === 'APPROVED' || item.status === 'REJECTED') && (
-          <div className="mt-5 rounded-xl border border-[var(--line)] bg-white/[0.02] p-4 text-xs">
+          <div className="mt-5 rounded-xl border-2 border-[var(--line)] bg-[#fffdfa] p-4 text-xs shadow-[2px_2px_0_var(--line)]">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <UserCheck className="size-4 text-[var(--cyan)]" />
-                <span className="font-semibold text-white">Human Review Resolution</span>
+                <UserCheck className="size-4 text-[#134e56]" />
+                <span className="font-bold text-[var(--text)]">Human Review Resolution</span>
               </div>
               <Badge kind={item.status}>{item.status}</Badge>
             </div>
             {item.resolved_by && (
-              <div className="mt-2 text-[var(--muted)]">
-                Decided by: <b className="text-white">{item.resolved_by}</b>
+              <div className="mt-2 font-medium text-[var(--muted)]">
+                Decided by: <b className="text-[var(--text)]">{item.resolved_by}</b>
               </div>
             )}
             {item.reviewer_notes && (
-              <div className="mt-1 text-[var(--muted)]">
-                Notes: <span className="text-[#c6d4e2]">{item.reviewer_notes}</span>
+              <div className="mt-1 font-medium text-[var(--muted)]">
+                Notes: <span className="text-[var(--text)]">{item.reviewer_notes}</span>
               </div>
             )}
             {item.resolved_at && (
@@ -286,15 +286,15 @@ export function ActionDetailDrawer({ item, onClose, onDecide }: ActionDetailDraw
         {/* Tool Execution Result */}
         {executionResult && (
           <div className="mt-5">
-            <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
-              <CheckCircle2 className="size-3.5 text-[var(--green)]" /> Tool Execution Outcome
+            <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[var(--text)]">
+              <CheckCircle2 className="size-3.5 text-[#26541b]" /> Tool Execution Outcome
             </div>
-            <div className="rounded-xl border border-[var(--line)] bg-white/[0.02] p-4 text-xs">
-              <div className="flex items-center justify-between text-[var(--muted)]">
-                <span>Status: <b className="text-white uppercase">{executionResult.status}</b></span>
-                <span>Latency: <b className="text-white">{executionResult.execution_time_ms.toFixed(2)} ms</b></span>
+            <div className="rounded-xl border-2 border-[var(--line)] bg-[#fffdfa] p-4 text-xs shadow-[2px_2px_0_var(--line)]">
+              <div className="flex items-center justify-between text-[var(--text)]">
+                <span>Status: <b className="uppercase font-bold">{executionResult.status}</b></span>
+                <span>Latency: <b className="font-bold">{executionResult.execution_time_ms.toFixed(2)} ms</b></span>
               </div>
-              <pre className="scrollbar mt-2 max-h-40 overflow-auto rounded-lg bg-black/40 p-3 font-mono text-[11px] text-[#9cb1c9]">
+              <pre className="scrollbar mt-2 max-h-40 overflow-auto rounded-lg border border-[var(--line)] bg-[#221c27] p-3 font-mono text-[11px] text-[#f7f2e8]">
                 {JSON.stringify(executionResult.output || {}, null, 2)}
               </pre>
             </div>
@@ -303,28 +303,28 @@ export function ActionDetailDrawer({ item, onClose, onDecide }: ActionDetailDraw
 
         {/* Human In The Loop Decision Actions */}
         {isPendingApproval && approvalId && onDecide && (
-          <div className="mt-7 rounded-xl border border-[#e7b96b44] bg-[#e7b96b0c] p-4">
-            <div className="flex items-center gap-2 text-xs font-semibold text-[#e7b96b]">
+          <div className="mt-7 rounded-2xl border-2 border-[var(--line)] bg-[#f5cf7726] p-4 shadow-[3px_3px_0_var(--line)]">
+            <div className="flex items-center gap-2 text-xs font-bold text-[#6d4508]">
               <AlertTriangle className="size-4" /> Human-in-the-Loop Approval Required
             </div>
-            <p className="mt-1 text-xs text-[var(--muted)]">
+            <p className="mt-1 text-xs font-medium text-[var(--muted)]">
               This action is paused. Authorize execution or block it from continuing.
             </p>
 
             <div className="mt-4 space-y-3">
               <div>
-                <label className="block text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)]">
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--text)]">
                   Reviewer ID
                 </label>
                 <input
                   type="text"
                   value={reviewerName}
                   onChange={(e) => setReviewerName(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-[var(--line)] bg-black/40 px-3 py-2 text-xs text-white outline-none focus:border-[var(--cyan)]"
+                  className="mt-1 w-full rounded-xl border-2 border-[var(--line)] bg-[#fffdfa] px-3 py-2 text-xs text-[var(--text)] outline-none focus:ring-2 focus:ring-[var(--cyan)]/40"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)]">
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--text)]">
                   Reviewer Notes (Optional)
                 </label>
                 <textarea
@@ -332,12 +332,12 @@ export function ActionDetailDrawer({ item, onClose, onDecide }: ActionDetailDraw
                   placeholder="e.g. Authorized one-time VIP refund after customer phone call"
                   value={reviewerNotes}
                   onChange={(e) => setReviewerNotes(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-[var(--line)] bg-black/40 px-3 py-2 text-xs text-white outline-none focus:border-[var(--cyan)]"
+                  className="mt-1 w-full rounded-xl border-2 border-[var(--line)] bg-[#fffdfa] px-3 py-2 text-xs text-[var(--text)] outline-none focus:ring-2 focus:ring-[var(--cyan)]/40"
                 />
               </div>
 
               {actionError && (
-                <div className="rounded-lg border border-[#ff6d7a44] bg-[#ff6d7a12] p-3 text-xs text-[#ff6d7a]">
+                <div className="rounded-xl border-2 border-[var(--red)] bg-[var(--red)]/15 p-3 text-xs font-semibold text-[#8a1936]">
                   {actionError}
                 </div>
               )}
@@ -346,7 +346,7 @@ export function ActionDetailDrawer({ item, onClose, onDecide }: ActionDetailDraw
                 <button
                   disabled={submitting}
                   onClick={() => handleDecision('APPROVE')}
-                  className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-[var(--green)] px-4 py-2.5 text-xs font-semibold text-black transition hover:opacity-90 disabled:opacity-50"
+                  className="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-[var(--line)] bg-[var(--green)] px-4 py-2.5 text-xs font-bold text-[var(--text)] shadow-[2px_2px_0_var(--line)] transition hover:opacity-90 disabled:opacity-50 cursor-pointer"
                 >
                   {submitting ? <Loader2 className="size-4 animate-spin" /> : <CheckCircle2 className="size-4" />}
                   Approve &amp; Execute
@@ -354,7 +354,7 @@ export function ActionDetailDrawer({ item, onClose, onDecide }: ActionDetailDraw
                 <button
                   disabled={submitting}
                   onClick={() => handleDecision('REJECT')}
-                  className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-[#ff6d7a66] bg-[#ff6d7a18] px-4 py-2.5 text-xs font-semibold text-[#ff6d7a] transition hover:bg-[#ff6d7a28] disabled:opacity-50"
+                  className="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-[var(--line)] bg-[var(--red)] px-4 py-2.5 text-xs font-bold text-[var(--text)] shadow-[2px_2px_0_var(--line)] transition hover:opacity-90 disabled:opacity-50 cursor-pointer"
                 >
                   {submitting ? <Loader2 className="size-4 animate-spin" /> : <X className="size-4" />}
                   Reject Action

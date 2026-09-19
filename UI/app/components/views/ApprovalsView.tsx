@@ -57,10 +57,10 @@ export function ApprovalsView({
     <div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
       {/* Left Column: Pending Approvals Queue */}
       <Card>
-        <div className="flex items-center justify-between border-b border-[var(--line)] p-5">
+        <div className="flex items-center justify-between border-b-2 border-[var(--line)] p-5">
           <div className="flex items-center gap-2">
-            <h2 className="text-base font-semibold text-white">Pending Human Approvals</h2>
-            <span className="rounded-full bg-[#e7b96b]/15 px-2.5 py-0.5 text-xs font-bold text-[#e7b96b]">
+            <h2 className="text-base font-bold text-[var(--text)]">Pending Human Approvals</h2>
+            <span className="rounded-full border border-[var(--line)] bg-[var(--amber)]/25 px-2.5 py-0.5 text-xs font-bold text-[#6d4508]">
               {approvals.length} pending
             </span>
           </div>
@@ -75,36 +75,36 @@ export function ApprovalsView({
             description="There are currently no actions paused in the approval queue. High-threshold actions will appear here automatically."
           />
         ) : (
-          <div className="divide-y divide-[var(--line)]">
+          <div className="divide-y-2 divide-[var(--line)]">
             {approvals.map((item) => {
               const isActing = actingId === item.approval_id;
               return (
                 <div
                   key={item.approval_id}
                   onClick={() => onOpenItem(item)}
-                  className="cursor-pointer p-5 transition hover:bg-white/[0.02]"
+                  className="cursor-pointer p-5 transition hover:bg-[var(--cyan)]/10"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-white text-sm">{item.tool_name}</span>
+                        <span className="font-bold text-[var(--text)] text-sm">{item.tool_name}</span>
                         <Badge kind={item.risk_level}>{item.risk_level}</Badge>
                       </div>
-                      <div className="mt-1 font-mono text-xs text-[var(--cyan)]">
+                      <div className="mt-1 font-mono text-xs font-bold text-[#134e56]">
                         Agent: {item.agent_id} ({item.agent_role})
                       </div>
                     </div>
-                    <div className="text-right text-[11px] text-[var(--muted)]">
+                    <div className="text-right text-[11px] font-medium text-[var(--muted)]">
                       {new Date(item.created_at).toLocaleTimeString()}
                     </div>
                   </div>
 
-                  <p className="mt-3 text-xs leading-relaxed text-[#c6d4e2]">
+                  <p className="mt-3 text-xs leading-relaxed font-medium text-[var(--text)]">
                     {item.reason}
                   </p>
 
                   {/* Parameters Excerpt */}
-                  <div className="mt-3 rounded-lg border border-[var(--line)] bg-black/30 p-2.5 font-mono text-[11px] text-[#9cb1c9]">
+                  <div className="mt-3 rounded-xl border-2 border-[var(--line)] bg-[#221c27] p-2.5 font-mono text-[11px] text-[#f7f2e8] shadow-[2px_2px_0_var(--line)]">
                     {JSON.stringify(item.parameters)}
                   </div>
 
@@ -112,23 +112,23 @@ export function ApprovalsView({
                   <div className="mt-4 flex items-center justify-between gap-3">
                     <button
                       onClick={() => onOpenItem(item)}
-                      className="text-xs text-[var(--muted)] hover:text-white flex items-center gap-1"
+                      className="text-xs font-bold text-[var(--text)] hover:opacity-75 flex items-center gap-1 cursor-pointer"
                     >
-                      View full details & policies <ChevronRight className="size-3.5" />
+                      View full details &amp; policies <ChevronRight className="size-3.5" />
                     </button>
 
                     <div className="flex gap-2">
                       <button
                         disabled={isActing}
                         onClick={(e) => handleQuickDecision(e, item.approval_id, 'REJECT')}
-                        className="rounded-lg border border-[#ff6d7a55] bg-[#ff6d7a12] px-3 py-1.5 text-xs font-semibold text-[#ff6d7a] transition hover:bg-[#ff6d7a25] disabled:opacity-50"
+                        className="rounded-xl border-2 border-[var(--line)] bg-[var(--red)] px-3 py-1.5 text-xs font-bold text-[var(--text)] shadow-[2px_2px_0_var(--line)] transition hover:opacity-90 disabled:opacity-50 cursor-pointer"
                       >
                         {isActing ? <Loader2 className="size-3.5 animate-spin" /> : 'Reject'}
                       </button>
                       <button
                         disabled={isActing}
                         onClick={(e) => handleQuickDecision(e, item.approval_id, 'APPROVE')}
-                        className="rounded-lg bg-[var(--green)] px-3 py-1.5 text-xs font-semibold text-black transition hover:opacity-90 disabled:opacity-50"
+                        className="rounded-xl border-2 border-[var(--line)] bg-[var(--green)] px-3 py-1.5 text-xs font-bold text-[var(--text)] shadow-[2px_2px_0_var(--line)] transition hover:opacity-90 disabled:opacity-50 cursor-pointer"
                       >
                         {isActing ? <Loader2 className="size-3.5 animate-spin" /> : 'Approve & Execute'}
                       </button>
@@ -144,17 +144,17 @@ export function ApprovalsView({
       {/* Right Column: Guidance & Policies Context */}
       <div className="space-y-6">
         <Card className="p-5">
-          <div className="flex items-center gap-3 text-[#e7b96b]">
+          <div className="flex items-center gap-3 text-[#6d4508]">
             <AlertTriangle className="size-5" />
-            <h2 className="font-semibold text-white">Reviewer Operations Policy</h2>
+            <h2 className="font-bold text-[var(--text)]">Reviewer Operations Policy</h2>
           </div>
-          <p className="mt-3 text-xs leading-relaxed text-[var(--muted)]">
+          <p className="mt-3 text-xs leading-relaxed font-medium text-[var(--muted)]">
             Actions are paused by AgentGuard when they exceed preset corporate financial thresholds,
             attempt bulk customer data exports, or involve sensitive payment operations.
           </p>
-          <div className="mt-4 space-y-2 border-t border-[var(--line)] pt-4 text-xs">
-            <div className="text-white font-medium">Automatic execution on approval:</div>
-            <p className="text-[var(--muted)] leading-5">
+          <div className="mt-4 space-y-2 border-t-2 border-[var(--line)] pt-4 text-xs">
+            <div className="text-[var(--text)] font-bold">Automatic execution on approval:</div>
+            <p className="text-[var(--muted)] font-medium leading-5">
               Approving an action automatically releases it to the tool executor and indexes the
               favorable decision into Moss incident memory for future contextual safety inference.
             </p>
@@ -162,11 +162,11 @@ export function ApprovalsView({
         </Card>
 
         <Card className="p-5">
-          <div className="flex items-center gap-3 text-[var(--cyan)]">
+          <div className="flex items-center gap-3 text-[#134e56]">
             <Clock3 className="size-5" />
-            <h2 className="font-semibold text-white">Real-Time SLA</h2>
+            <h2 className="font-bold text-[var(--text)]">Real-Time SLA</h2>
           </div>
-          <p className="mt-2 text-xs leading-relaxed text-[var(--muted)]">
+          <p className="mt-2 text-xs leading-relaxed font-medium text-[var(--muted)]">
             Standard supervisor SLA for paused agent workflows is under 5 minutes. WebSocket clients
             receive instant notifications the moment a human resolution is broadcast.
           </p>

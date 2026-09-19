@@ -35,7 +35,7 @@ export function Header({
         <div className="flex items-center gap-3">
           <button
             onClick={onToggleMobile}
-            className="rounded-lg p-2 text-[var(--muted)] hover:bg-white/5 md:hidden"
+            className="rounded-lg p-2 text-[var(--muted)] hover:bg-[var(--cyan)]/20 md:hidden"
           >
             <Menu className="size-5" />
           </button>
@@ -43,10 +43,10 @@ export function Header({
             <Shield className="size-5" />
           </div>
           <div>
-            <div className="font-semibold tracking-tight text-white">
-              Agent<span className="text-[var(--pink)]">Guard</span>
+            <div className="font-bold tracking-tight text-[var(--text)]">
+              Agent<span className="text-[#8a1936]">Guard</span>
             </div>
-            <div className="hidden text-[10px] uppercase tracking-[.2em] text-[var(--muted)] sm:block">
+            <div className="hidden text-[10px] font-bold uppercase tracking-[.2em] text-[var(--muted)] sm:block">
               Sub-10ms Security & Reliability Layer
             </div>
           </div>
@@ -54,20 +54,20 @@ export function Header({
 
         <div className="flex items-center gap-3 text-xs">
           {/* Detailed WebSocket Connection Pill */}
-          <div className="flex items-center gap-2 rounded-full border border-[var(--line)] bg-white/[0.02] px-3 py-1 text-[var(--muted)]">
+          <div className="flex items-center gap-2 rounded-xl border-2 border-[var(--line)] bg-[#fffdfa] px-3 py-1 text-[var(--muted)] shadow-[2px_2px_0_var(--line)]">
             {isConnected ? (
               <>
-                <span className="size-2 rounded-full bg-[var(--green)] animate-pulse" />
-                <span className="text-white font-medium flex items-center gap-1.5">
-                  <Wifi className="size-3 text-[var(--green)]" />
+                <span className="size-2 rounded-full bg-[#26541b] animate-pulse" />
+                <span className="text-[var(--text)] font-bold flex items-center gap-1.5">
+                  <Wifi className="size-3 text-[#26541b]" />
                   <span className="hidden sm:inline">Live Stream Connected</span>
                   <span className="sm:hidden">Live</span>
                 </span>
               </>
             ) : isReconnecting || isConnecting ? (
               <>
-                <span className="size-2 rounded-full bg-[#e7b96b] animate-ping" />
-                <span className="text-[#e7b96b] font-medium flex items-center gap-1.5">
+                <span className="size-2 rounded-full bg-[#6d4508] animate-ping" />
+                <span className="text-[#6d4508] font-bold flex items-center gap-1.5">
                   <WifiOff className="size-3" />
                   {isConnecting
                     ? 'Connecting...'
@@ -75,21 +75,21 @@ export function Header({
                 </span>
                 <button
                   onClick={onManualReconnect}
-                  className="ml-1 text-[10px] underline hover:text-white"
+                  className="ml-1 text-[10px] font-bold underline text-[var(--text)] hover:opacity-75"
                 >
                   Retry
                 </button>
               </>
             ) : (
               <>
-                <span className="size-2 rounded-full bg-[#ff6d7a]" />
-                <span className="text-[#ff6d7a] font-medium flex items-center gap-1.5">
+                <span className="size-2 rounded-full bg-[#8a1936]" />
+                <span className="text-[#8a1936] font-bold flex items-center gap-1.5">
                   <WifiOff className="size-3" />
                   Stream Offline (Polling)
                 </span>
                 <button
                   onClick={onManualReconnect}
-                  className="ml-1 text-[10px] underline hover:text-white"
+                  className="ml-1 text-[10px] font-bold underline text-[var(--text)] hover:opacity-75"
                 >
                   Reconnect
                 </button>
@@ -100,7 +100,7 @@ export function Header({
           {/* Quick simulator trigger */}
           <button
             onClick={onOpenSimulator}
-            className="hidden items-center gap-1.5 rounded-lg border-2 border-[var(--line)] bg-[var(--green)] px-3 py-1.5 text-xs font-bold text-[var(--text)] shadow-[2px_2px_0_var(--line)] transition hover:bg-[var(--cyan)]/20 md:flex"
+            className="hidden items-center gap-1.5 rounded-xl border-2 border-[var(--line)] bg-[var(--green)] px-3 py-1.5 text-xs font-bold text-[var(--text)] shadow-[2px_2px_0_var(--line)] transition hover:opacity-90 md:flex cursor-pointer"
           >
             Simulator
           </button>
@@ -109,15 +109,15 @@ export function Header({
           <button
             onClick={onRefresh}
             disabled={refreshing}
-            className="flex items-center gap-1.5 rounded-lg border border-[var(--line)] bg-[var(--panel)] px-3 py-1.5 text-xs text-[var(--muted)] transition hover:bg-white/5 hover:text-white disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-xl border-2 border-[var(--line)] bg-[#fffdfa] px-3 py-1.5 text-xs font-bold text-[var(--text)] shadow-[2px_2px_0_var(--line)] transition hover:opacity-90 disabled:opacity-50 cursor-pointer"
             title="Refresh live data"
           >
-            <RefreshCw className={`size-3.5 ${refreshing ? 'animate-spin text-[var(--cyan)]' : ''}`} />
+            <RefreshCw className={`size-3.5 ${refreshing ? 'animate-spin text-[#134e56]' : ''}`} />
             <span className="hidden sm:inline">Sync</span>
           </button>
 
           {/* User avatar */}
-          <div className="flex size-8 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--panel2)] text-xs font-bold text-white">
+          <div className="flex size-8 items-center justify-center rounded-full border-2 border-[var(--line)] bg-[var(--panel2)] text-xs font-bold text-[var(--text)] shadow-[1px_1px_0_var(--line)]">
             AG
           </div>
         </div>
@@ -125,16 +125,16 @@ export function Header({
 
       {/* Graceful Degraded State Banner */}
       {!isConnected && (
-        <div className="flex items-center justify-between border-b border-[#e7b96b33] bg-[#e7b96b0f] px-4 py-2 text-xs text-[#e7b96b]">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="size-4 shrink-0" />
+        <div className="flex items-center justify-between border-b-2 border-[var(--line)] bg-[var(--amber)]/30 px-4 py-2 text-xs text-[#6d4508]">
+          <div className="flex items-center gap-2 font-medium">
+            <AlertTriangle className="size-4 shrink-0 text-[#6d4508]" />
             <span>
-              <b>Real-time WebSocket stream disconnected.</b> Graceful fallback polling is active to keep decision counts and pending approvals synchronized.
+              <b className="font-bold text-[var(--text)]">Real-time WebSocket stream disconnected.</b> Graceful fallback polling is active to keep decision counts and pending approvals synchronized.
             </span>
           </div>
           <button
             onClick={onManualReconnect}
-            className="ml-4 shrink-0 rounded border border-[#e7b96b66] bg-[#e7b96b22] px-2.5 py-0.5 text-[11px] font-semibold text-white transition hover:bg-[#e7b96b33]"
+            className="ml-4 shrink-0 rounded-lg border-2 border-[var(--line)] bg-[var(--amber)] px-2.5 py-0.5 text-[11px] font-bold text-[var(--text)] shadow-[1px_1px_0_var(--line)] transition hover:opacity-90 cursor-pointer"
           >
             Reconnect Now
           </button>

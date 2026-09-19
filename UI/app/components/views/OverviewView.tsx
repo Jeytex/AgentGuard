@@ -58,15 +58,15 @@ export function OverviewView({
         <Card
           onClick={() => onNavigate('Interceptions')}
           aria-label="View all interceptions and audit decisions"
-          className="p-5 transition hover:border-[var(--cyan)]/40 hover:bg-white/[0.02]"
+          className="p-5 transition hover:border-[var(--line)] cursor-pointer"
         >
           <div className="flex items-start justify-between">
             <div>
-              <div className="text-xs font-medium text-[var(--muted)]">Total Decisions</div>
-              <div className="mt-2 text-2xl font-bold text-white">{metrics.total}</div>
-              <div className="mt-1 text-[11px] text-[var(--muted)]">Persisted audit events</div>
+              <div className="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">Total Decisions</div>
+              <div className="mt-2 text-2xl font-bold text-[var(--text)]">{metrics.total}</div>
+              <div className="mt-1 text-[11px] font-medium text-[var(--muted)]">Persisted audit events</div>
             </div>
-            <div className="rounded-xl bg-[var(--cyan)]/10 p-2.5 text-[var(--cyan)]">
+            <div className="rounded-xl border-2 border-[var(--line)] bg-[var(--cyan)] p-2.5 text-[var(--text)] shadow-[2px_2px_0_var(--line)]">
               <Activity className="size-5" />
             </div>
           </div>
@@ -75,17 +75,17 @@ export function OverviewView({
         <Card
           onClick={() => onNavigate('Interceptions')}
           aria-label="View allow rate details in interceptions"
-          className="p-5 transition hover:border-[var(--green)]/40 hover:bg-white/[0.02]"
+          className="p-5 transition hover:border-[var(--line)] cursor-pointer"
         >
           <div className="flex items-start justify-between">
             <div>
-              <div className="text-xs font-medium text-[var(--muted)]">Allow Rate</div>
-              <div className="mt-2 text-2xl font-bold text-[var(--green)]">
+              <div className="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">Allow Rate</div>
+              <div className="mt-2 text-2xl font-bold text-[#26541b]">
                 {interceptions.length > 0 ? `${metrics.allowRate}%` : '100%'}
               </div>
-              <div className="mt-1 text-[11px] text-[var(--muted)]">Policy compliant actions</div>
+              <div className="mt-1 text-[11px] font-medium text-[var(--muted)]">Policy compliant actions</div>
             </div>
-            <div className="rounded-xl bg-[var(--green)]/10 p-2.5 text-[var(--green)]">
+            <div className="rounded-xl border-2 border-[var(--line)] bg-[var(--green)] p-2.5 text-[var(--text)] shadow-[2px_2px_0_var(--line)]">
               <CheckCircle2 className="size-5" />
             </div>
           </div>
@@ -94,17 +94,17 @@ export function OverviewView({
         <Card
           onClick={() => onNavigate('Benchmarks')}
           aria-label="View telemetry and P95 latency benchmarks"
-          className="p-5 transition hover:border-purple-400/40 hover:bg-white/[0.02]"
+          className="p-5 transition hover:border-[var(--line)] cursor-pointer"
         >
           <div className="flex items-start justify-between">
             <div>
-              <div className="text-xs font-medium text-[var(--muted)]">P95 Pipeline Latency</div>
-              <div className="mt-2 text-2xl font-bold text-white">{metrics.p95}</div>
-              <div className="mt-1 text-[11px] text-[var(--muted)]">
+              <div className="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">P95 Pipeline Latency</div>
+              <div className="mt-2 text-2xl font-bold text-[var(--text)]">{metrics.p95}</div>
+              <div className="mt-1 text-[11px] font-medium text-[var(--muted)]">
                 {benchmarkResult ? 'From live benchmark' : 'Target: sub-10ms'}
               </div>
             </div>
-            <div className="rounded-xl bg-purple-400/10 p-2.5 text-purple-400">
+            <div className="rounded-xl border-2 border-[var(--line)] bg-[var(--purple)] p-2.5 text-[var(--text)] shadow-[2px_2px_0_var(--line)]">
               <Gauge className="size-5" />
             </div>
           </div>
@@ -113,15 +113,15 @@ export function OverviewView({
         <Card
           onClick={() => onNavigate('Policies')}
           aria-label="View active security policies indexed in Moss"
-          className="p-5 transition hover:border-[var(--cyan)]/40 hover:bg-white/[0.02]"
+          className="p-5 transition hover:border-[var(--line)] cursor-pointer"
         >
           <div className="flex items-start justify-between">
             <div>
-              <div className="text-xs font-medium text-[var(--muted)]">Policies Indexed in Moss</div>
-              <div className="mt-2 text-2xl font-bold text-[var(--cyan)]">
+              <div className="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">Policies Indexed in Moss</div>
+              <div className="mt-2 text-2xl font-bold text-[#134e56]">
                 {health?.total_policies_indexed ?? '—'}
               </div>
-              <div className="mt-1 text-[11px] text-[var(--muted)]">
+              <div className="mt-1 text-[11px] font-medium text-[var(--muted)]">
                 {health?.moss_connected
                   ? 'In-process active'
                   : health?.active_mode === 'degraded_local'
@@ -133,7 +133,7 @@ export function OverviewView({
                   : 'Checking connection...'}
               </div>
             </div>
-            <div className="rounded-xl bg-[var(--cyan)]/10 p-2.5 text-[var(--cyan)]">
+            <div className="rounded-xl border-2 border-[var(--line)] bg-[var(--cyan)] p-2.5 text-[var(--text)] shadow-[2px_2px_0_var(--line)]">
               <Database className="size-5" />
             </div>
           </div>
@@ -144,49 +144,49 @@ export function OverviewView({
       <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr]">
         {/* Live Decision Feed */}
         <Card>
-          <div className="flex items-center justify-between border-b border-[var(--line)] px-5 py-4">
+          <div className="flex items-center justify-between border-b-2 border-[var(--line)] px-5 py-4">
             <div>
-              <h2 className="text-sm font-semibold text-white">Live Decision Activity</h2>
-              <p className="mt-0.5 text-xs text-[var(--muted)]">
+              <h2 className="text-base font-bold text-[var(--text)]">Live Decision Activity</h2>
+              <p className="mt-0.5 text-xs font-medium text-[var(--muted)]">
                 Real-time stream from AgentGuard evaluation gateway
               </p>
             </div>
-            <div className="flex items-center gap-2 text-xs font-medium text-[var(--green)]">
-              <span className="size-2 rounded-full bg-[var(--green)] animate-ping" />
+            <div className="flex items-center gap-2 text-xs font-bold text-[#26541b]">
+              <span className="size-2.5 rounded-full bg-[#26541b] animate-pulse" />
               <Wifi className="size-3.5" /> Live
             </div>
           </div>
 
-          <div className="divide-y divide-[var(--line)]">
+          <div className="divide-y-2 divide-[var(--line)]">
             {interceptions.slice(0, 6).map((item) => (
               <button
                 key={item.action_id}
                 onClick={() => onOpenItem(item)}
-                className="flex w-full items-center gap-4 px-5 py-3.5 text-left transition hover:bg-white/[0.02]"
+                className="flex w-full items-center gap-4 px-5 py-3.5 text-left transition hover:bg-[var(--cyan)]/10 cursor-pointer"
               >
-                <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white/5 text-[var(--cyan)]">
+                <div className="flex size-8 shrink-0 items-center justify-center rounded-xl border-2 border-[var(--line)] bg-[var(--cyan)] text-[var(--text)] shadow-[2px_2px_0_var(--line)]">
                   <Activity className="size-4" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="truncate text-xs font-semibold text-white">
+                  <div className="truncate text-xs font-bold text-[var(--text)]">
                     {item.tool_name}
                   </div>
-                  <div className="mt-0.5 truncate text-[11px] text-[var(--muted)]">
-                    {item.agent_id} • {item.reason}
+                  <div className="mt-0.5 truncate text-[11px] font-medium text-[var(--muted)]">
+                    <span className="font-bold text-[#134e56]">{item.agent_id}</span> • {item.reason}
                   </div>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
                   <Badge kind={item.verdict}>{item.verdict}</Badge>
-                  <span className="hidden font-mono text-[11px] text-[var(--cyan)] sm:inline">
+                  <span className="hidden font-mono text-[11px] font-bold text-[#134e56] sm:inline">
                     {item.latency?.total_latency_ms ? `${item.latency.total_latency_ms.toFixed(1)}ms` : ''}
                   </span>
-                  <ChevronRight className="size-4 text-[var(--muted)]" />
+                  <ChevronRight className="size-4 text-[var(--text)]" />
                 </div>
               </button>
             ))}
 
             {interceptions.length === 0 && (
-              <div className="p-8 text-center text-xs text-[var(--muted)]">
+              <div className="p-8 text-center text-xs font-medium text-[var(--muted)]">
                 No decisions recorded yet. Run a scenario in the Simulator to see live events.
               </div>
             )}
@@ -196,28 +196,28 @@ export function OverviewView({
         {/* Decision Distribution & Pending Review Alert */}
         <div className="space-y-6">
           <Card className="p-5">
-            <h2 className="text-sm font-semibold text-white">Decision Distribution</h2>
-            <p className="mt-0.5 text-xs text-[var(--muted)]">All evaluated actions breakdown</p>
+            <h2 className="text-base font-bold text-[var(--text)]">Decision Distribution</h2>
+            <p className="mt-0.5 text-xs font-medium text-[var(--muted)]">All evaluated actions breakdown</p>
 
             <div className="mt-5 space-y-4">
               {[
-                ['ALLOW', metrics.allows, '#62d99a'],
-                ['BLOCK', metrics.blocks, '#ff6d7a'],
-                ['REQUIRE_APPROVAL', metrics.approvals, '#e7b96b'],
+                ['ALLOW', metrics.allows, '#26541b'],
+                ['BLOCK', metrics.blocks, '#8a1936'],
+                ['REQUIRE_APPROVAL', metrics.approvals, '#6d4508'],
               ].map(([name, count, color]) => {
                 const total = Math.max(1, metrics.total);
                 const pct = Math.round(((count as number) / total) * 100);
                 return (
                   <div key={name as string}>
                     <div className="mb-1.5 flex justify-between text-xs">
-                      <span className="text-[var(--muted)] font-medium">
+                      <span className="text-[var(--text)] font-bold">
                         {(name as string).replace('REQUIRE_APPROVAL', 'HUMAN APPROVAL')}
                       </span>
-                      <span className="font-mono text-white font-semibold">
+                      <span className="font-mono text-[var(--text)] font-bold">
                         {count as number} ({pct}%)
                       </span>
                     </div>
-                    <div className="h-2 w-full rounded-full bg-white/5">
+                    <div className="h-3 w-full rounded-full border border-[var(--line)] bg-black/10 overflow-hidden">
                       <div
                         style={{
                           width: `${Math.max(4, pct)}%`,
@@ -234,22 +234,22 @@ export function OverviewView({
 
           {/* Pending Review Quick Card */}
           {pendingCount > 0 && (
-            <Card className="border-[#e7b96b44] bg-[#e7b96b08] p-5">
+            <Card className="border-2 border-[var(--line)] bg-[var(--amber)]/25 p-5 shadow-[3px_3px_0_var(--line)]">
               <div className="flex items-start justify-between">
                 <div>
-                  <div className="text-xs font-semibold uppercase tracking-wider text-[#e7b96b]">
+                  <div className="text-xs font-bold uppercase tracking-wider text-[#6d4508]">
                     Human Attention Required
                   </div>
-                  <div className="mt-1 text-base font-bold text-white">
+                  <div className="mt-1 text-base font-bold text-[var(--text)]">
                     {pendingCount} Pending Approval{pendingCount > 1 ? 's' : ''}
                   </div>
-                  <p className="mt-1 text-xs text-[var(--muted)]">
+                  <p className="mt-1 text-xs font-medium text-[var(--muted)]">
                     Critical or high-threshold actions paused awaiting supervisor review.
                   </p>
                 </div>
                 <button
                   onClick={() => onNavigate('Approvals')}
-                  className="rounded-lg bg-[#e7b96b] px-3 py-1.5 text-xs font-semibold text-black transition hover:opacity-90"
+                  className="rounded-xl border-2 border-[var(--line)] bg-[var(--amber)] px-3.5 py-1.5 text-xs font-bold text-[var(--text)] shadow-[2px_2px_0_var(--line)] transition hover:opacity-90 cursor-pointer"
                 >
                   Review Now
                 </button>
@@ -260,15 +260,15 @@ export function OverviewView({
       </div>
 
       {/* Benchmark Live Telemetry Promo Card */}
-      <Card className="border-purple-400/20 bg-purple-400/5 p-5">
+      <Card className="border-2 border-[var(--line)] bg-[var(--panel2)]/40 p-5 shadow-[3px_3px_0_var(--line)]">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-4">
-            <div className="rounded-xl border border-[var(--line)]/20 bg-[var(--purple)]/25 p-2.5 text-[var(--line)]">
+            <div className="rounded-xl border-2 border-[var(--line)] bg-[var(--purple)] p-2.5 text-[var(--text)] shadow-[2px_2px_0_var(--line)]">
               <Zap className="size-5" />
             </div>
             <div>
-              <div className="text-sm font-semibold text-white">Sub-10ms Empirical Latency Benchmark</div>
-              <p className="mt-1 max-w-xl text-xs text-[var(--muted)]">
+              <div className="text-base font-bold text-[var(--text)]">Sub-10ms Empirical Latency Benchmark</div>
+              <p className="mt-1 max-w-xl text-xs font-medium text-[var(--muted)] leading-relaxed">
                 {benchmarkResult
                   ? `Last run verified: ${benchmarkResult.speedup_factor.toFixed(1)}x speedup over cloud vector DBs (P95: ${benchmarkResult.total_pipeline.p95_ms.toFixed(2)}ms).`
                   : 'Run side-by-side empirical performance test comparing in-process Moss hybrid search vs remote vector DBs.'}
@@ -277,7 +277,7 @@ export function OverviewView({
           </div>
           <button
             onClick={() => onNavigate('Benchmarks')}
-            className="flex items-center gap-1.5 self-start rounded-xl border-2 border-[var(--line)] bg-[var(--purple)] px-4 py-2 text-xs font-bold text-[var(--line)] shadow-[2px_2px_0_var(--line)] transition hover:-translate-y-0.5 hover:opacity-95 sm:self-center cursor-pointer"
+            className="flex items-center gap-1.5 self-start rounded-xl border-2 border-[var(--line)] bg-[var(--purple)] px-4 py-2 text-xs font-bold text-[var(--text)] shadow-[2px_2px_0_var(--line)] transition hover:-translate-y-0.5 hover:opacity-95 sm:self-center cursor-pointer"
           >
             {benchmarkResult ? 'View Full Telemetry' : 'Run Benchmark'} <ArrowUpRight className="size-4" />
           </button>
@@ -285,22 +285,22 @@ export function OverviewView({
       </Card>
 
       {/* Simulator Promo Card */}
-      <Card className="border-[#56d8e433] bg-[#56d8e408] p-5">
+      <Card className="border-2 border-[var(--line)] bg-[var(--cyan)]/15 p-5 shadow-[3px_3px_0_var(--line)]">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-4">
-            <div className="rounded-xl border border-[var(--line)]/20 bg-[var(--cyan)]/25 p-2.5 text-[var(--line)]">
+            <div className="rounded-xl border-2 border-[var(--line)] bg-[var(--cyan)] p-2.5 text-[var(--text)] shadow-[2px_2px_0_var(--line)]">
               <Terminal className="size-5" />
             </div>
             <div>
-              <div className="text-sm font-semibold text-white">Interactive Attack & Scenario Simulator</div>
-              <p className="mt-1 max-w-xl text-xs text-[var(--muted)]">
+              <div className="text-base font-bold text-[var(--text)]">Interactive Attack & Scenario Simulator</div>
+              <p className="mt-1 max-w-xl text-xs font-medium text-[var(--muted)] leading-relaxed">
                 Test real-time defense against destructive SQL injections, excessive financial refunds, PII leaks, and privilege escalations in sub-10ms.
               </p>
             </div>
           </div>
           <button
             onClick={() => onNavigate('Simulator')}
-            className="flex items-center gap-1.5 self-start rounded-xl border-2 border-[var(--line)] bg-[var(--cyan)] px-4 py-2 text-xs font-bold text-[var(--line)] shadow-[2px_2px_0_var(--line)] transition hover:-translate-y-0.5 hover:opacity-95 sm:self-center cursor-pointer"
+            className="flex items-center gap-1.5 self-start rounded-xl border-2 border-[var(--line)] bg-[var(--cyan)] px-4 py-2 text-xs font-bold text-[var(--text)] shadow-[2px_2px_0_var(--line)] transition hover:-translate-y-0.5 hover:opacity-95 sm:self-center cursor-pointer"
           >
             Launch Simulator <ArrowUpRight className="size-4" />
           </button>

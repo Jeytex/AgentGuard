@@ -15,12 +15,12 @@ export function AgentsView({ agents, loading }: AgentsViewProps) {
     <div>
       <div className="mb-5 flex items-center justify-between">
         <div>
-          <h2 className="text-base font-semibold text-white">Monitored Autonomous Agent Fleet</h2>
-          <p className="mt-0.5 text-xs text-[var(--muted)]">
+          <h2 className="text-base font-bold text-[var(--text)]">Monitored Autonomous Agent Fleet</h2>
+          <p className="mt-0.5 text-xs font-medium text-[var(--muted)]">
             Active AI agents operating under AgentGuard continuous policy enforcement
           </p>
         </div>
-        <div className="text-xs text-[var(--muted)] font-medium">
+        <div className="text-xs text-[var(--text)] font-bold">
           {agents.length} agents under governance
         </div>
       </div>
@@ -51,45 +51,45 @@ export function AgentsView({ agents, loading }: AgentsViewProps) {
                   {/* Top Bar: Icon, Name & Status */}
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="flex size-10 items-center justify-center rounded-xl bg-[var(--cyan)]/15 text-[var(--cyan)]">
+                      <div className="flex size-10 items-center justify-center rounded-xl border-2 border-[var(--line)] bg-[var(--cyan)] text-[var(--text)] shadow-[2px_2px_0_var(--line)]">
                         <Bot className="size-5" />
                       </div>
                       <div>
-                        <div className="font-semibold text-white text-sm">{a.name}</div>
-                        <div className="font-mono text-[10px] text-[var(--muted)]">{a.agent_id}</div>
+                        <div className="font-bold text-[var(--text)] text-sm">{a.name}</div>
+                        <div className="font-mono text-[10px] font-bold text-[#134e56]">{a.agent_id}</div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5 rounded-full border border-[var(--line)] bg-white/[0.02] px-2.5 py-0.5 text-[10px]">
+                    <div className="flex items-center gap-1.5 rounded-full border-2 border-[var(--line)] bg-[var(--panel2)] px-2.5 py-0.5 text-[10px] font-bold text-[var(--text)] shadow-[2px_2px_0_var(--line)]">
                       <span
                         style={{ backgroundColor: statusColor }}
                         className="size-2 rounded-full"
                       />
-                      <span style={{ color: statusColor }} className="font-medium">
+                      <span>
                         {statusText}
                       </span>
                     </div>
                   </div>
 
-                  <p className="mt-3 text-xs text-[var(--muted)] leading-relaxed">
+                  <p className="mt-3 text-xs font-medium text-[var(--text)] leading-relaxed">
                     {a.description}
                   </p>
 
                   {/* Metadata Grid */}
                   <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
-                    <div className="rounded-lg bg-white/[0.02] p-2.5 border border-[var(--line)]">
-                      <div className="text-[10px] text-[var(--muted)]">Role</div>
-                      <div className="mt-1 font-medium text-white truncate">{a.role}</div>
+                    <div className="rounded-xl border-2 border-[var(--line)] bg-[#fffdfa] p-2.5 shadow-[2px_2px_0_var(--line)]">
+                      <div className="text-[10px] font-bold text-[var(--muted)]">Role</div>
+                      <div className="mt-1 font-bold text-[var(--text)] truncate">{a.role}</div>
                     </div>
-                    <div className="rounded-lg bg-white/[0.02] p-2.5 border border-[var(--line)]">
-                      <div className="text-[10px] text-[var(--muted)]">Threat Risk</div>
+                    <div className="rounded-xl border-2 border-[var(--line)] bg-[#fffdfa] p-2.5 shadow-[2px_2px_0_var(--line)]">
+                      <div className="text-[10px] font-bold text-[var(--muted)]">Threat Risk</div>
                       <div className="mt-1">
                         <Badge kind={a.risk_level}>{a.risk_level}</Badge>
                       </div>
                     </div>
-                    <div className="rounded-lg bg-white/[0.02] p-2.5 border border-[var(--line)]">
-                      <div className="text-[10px] text-[var(--muted)]">Total Actions</div>
-                      <div className="mt-1 font-mono font-semibold text-[var(--cyan)]">
+                    <div className="rounded-xl border-2 border-[var(--line)] bg-[#fffdfa] p-2.5 shadow-[2px_2px_0_var(--line)]">
+                      <div className="text-[10px] font-bold text-[var(--muted)]">Total Actions</div>
+                      <div className="mt-1 font-mono font-bold text-[var(--text)]">
                         {a.total_actions.toLocaleString()}
                       </div>
                     </div>
@@ -98,14 +98,14 @@ export function AgentsView({ agents, loading }: AgentsViewProps) {
                   {/* Allowed / Restricted Tools */}
                   <div className="mt-4 space-y-2 text-xs">
                     <div>
-                      <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)]">
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--text)]">
                         Authorized Scope
                       </div>
                       <div className="mt-1 flex flex-wrap gap-1">
                         {a.allowed_tools.map((t, idx) => (
                           <span
                             key={idx}
-                            className="rounded border border-[#62d99a33] bg-[#62d99a0e] px-2 py-0.5 font-mono text-[10px] text-[var(--green)]"
+                            className="rounded border border-[var(--line)] bg-[#b9dc7933] px-2 py-0.5 font-mono text-[10px] font-bold text-[#26541b]"
                           >
                             {t}
                           </span>
@@ -115,14 +115,14 @@ export function AgentsView({ agents, loading }: AgentsViewProps) {
 
                     {a.restricted_tools && a.restricted_tools.length > 0 && (
                       <div>
-                        <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)]">
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--text)]">
                           Restricted Boundaries
                         </div>
                         <div className="mt-1 flex flex-wrap gap-1">
                           {a.restricted_tools.map((t, idx) => (
                             <span
                               key={idx}
-                              className="rounded border border-[#ff6d7a33] bg-[#ff6d7a0e] px-2 py-0.5 font-mono text-[10px] text-[#ff6d7a]"
+                              className="rounded border border-[var(--line)] bg-[#ee86ad33] px-2 py-0.5 font-mono text-[10px] font-bold text-[#8a1936]"
                             >
                               {t}
                             </span>
@@ -135,20 +135,20 @@ export function AgentsView({ agents, loading }: AgentsViewProps) {
 
                 {/* Last Action Bar */}
                 {a.last_action && (
-                  <div className="mt-5 rounded-xl border border-[var(--line)] bg-black/30 p-3 text-xs">
-                    <div className="flex items-center justify-between text-[var(--muted)] text-[10px]">
+                  <div className="mt-5 rounded-xl border-2 border-[var(--line)] bg-[#fffdfa] p-3 text-xs shadow-[2px_2px_0_var(--line)]">
+                    <div className="flex items-center justify-between text-[var(--muted)] text-[10px] font-bold">
                       <span className="flex items-center gap-1">
-                        <Clock className="size-3" /> Last Intercepted Action
+                        <Clock className="size-3 text-[#134e56]" /> Last Intercepted Action
                       </span>
                       <span>{a.last_action.timestamp}</span>
                     </div>
                     <div className="mt-1.5 flex items-center justify-between">
-                      <span className="font-mono text-xs text-white font-medium truncate max-w-[180px]">
+                      <span className="font-mono text-xs text-[var(--text)] font-bold truncate max-w-[180px]">
                         {a.last_action.tool}
                       </span>
                       <div className="flex items-center gap-2">
                         <Badge kind={a.last_action.verdict}>{a.last_action.verdict}</Badge>
-                        <span className="font-mono text-[11px] text-[var(--cyan)]">
+                        <span className="font-mono text-[11px] font-bold text-[#134e56]">
                           {a.last_action.latency_ms.toFixed(1)}ms
                         </span>
                       </div>

@@ -9,17 +9,27 @@ interface BadgeProps {
 
 export const Badge = React.memo(function Badge({ children, kind = 'ALLOW', size = 'sm' }: BadgeProps) {
   const upper = String(kind).toUpperCase();
-  let color = '#62d99a'; // green
+  let textColor = '#26541b'; // dark forest green
+  let bgColor = '#b9dc7944'; // retro green pastel
+  let borderColor = '#26541b55';
   let label = children || upper;
 
   if (upper === 'BLOCK' || upper === 'CRITICAL' || upper === 'REJECTED') {
-    color = '#ff6d7a'; // red
+    textColor = '#8a1936'; // dark crimson red
+    bgColor = '#ee86ad44'; // retro pink/red pastel
+    borderColor = '#8a193655';
   } else if (upper === 'REQUIRE_APPROVAL' || upper === 'HIGH' || upper === 'MEDIUM' || upper === 'PENDING') {
-    color = '#e7b96b'; // amber
+    textColor = '#6d4508'; // dark amber bronze
+    bgColor = '#f5cf7744'; // retro amber pastel
+    borderColor = '#6d450855';
   } else if (upper === 'LOW' || upper === 'ALLOW' || upper === 'APPROVED') {
-    color = '#62d99a'; // green
+    textColor = '#26541b'; // dark forest green
+    bgColor = '#b9dc7944'; // retro green pastel
+    borderColor = '#26541b55';
   } else {
-    color = '#56d8e4'; // cyan
+    textColor = '#134e56'; // dark teal cyan
+    bgColor = '#8ed9d344'; // retro cyan pastel
+    borderColor = '#134e5655';
   }
 
   const text = String(label).replace('REQUIRE_APPROVAL', 'HUMAN APPROVAL');
@@ -28,11 +38,11 @@ export const Badge = React.memo(function Badge({ children, kind = 'ALLOW', size 
   return (
     <span
       style={{
-        color,
-        borderColor: `${color}55`,
-        backgroundColor: `${color}15`,
+        color: textColor,
+        borderColor,
+        backgroundColor: bgColor,
       }}
-      className={`inline-flex items-center rounded-md border font-mono font-semibold uppercase tracking-wider ${paddingClass}`}
+      className={`inline-flex items-center rounded-md border-2 font-mono font-bold uppercase tracking-wider ${paddingClass}`}
     >
       {text}
     </span>
@@ -40,14 +50,24 @@ export const Badge = React.memo(function Badge({ children, kind = 'ALLOW', size 
 });
 
 export const RiskScoreBadge = React.memo(function RiskScoreBadge({ score }: { score: number }) {
-  let color = '#62d99a';
-  if (score >= 80) color = '#ff6d7a';
-  else if (score >= 40) color = '#e7b96b';
+  let textColor = '#26541b';
+  let bgColor = '#b9dc7944';
+  let borderColor = '#26541b55';
+
+  if (score >= 80) {
+    textColor = '#8a1936';
+    bgColor = '#ee86ad44';
+    borderColor = '#8a193655';
+  } else if (score >= 40) {
+    textColor = '#6d4508';
+    bgColor = '#f5cf7744';
+    borderColor = '#6d450855';
+  }
 
   return (
     <span
-      style={{ color, borderColor: `${color}44`, backgroundColor: `${color}12` }}
-      className="inline-flex items-center rounded px-2 py-0.5 font-mono text-xs font-bold"
+      style={{ color: textColor, borderColor, backgroundColor: bgColor }}
+      className="inline-flex items-center rounded border-2 px-2 py-0.5 font-mono text-xs font-bold"
     >
       {score}/100
     </span>

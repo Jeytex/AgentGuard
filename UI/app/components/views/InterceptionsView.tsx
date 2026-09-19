@@ -38,10 +38,10 @@ export function InterceptionsView({
   return (
     <Card>
       {/* View Header & Filter Bar */}
-      <div className="flex flex-col gap-4 border-b border-[var(--line)] p-5 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-4 border-b-2 border-[var(--line)] p-5 md:flex-row md:items-center md:justify-between">
         <div>
-          <h2 className="text-base font-semibold text-white">Intercepted Agent Actions</h2>
-          <p className="mt-0.5 text-xs text-[var(--muted)]">
+          <h2 className="text-base font-bold text-[var(--text)]">Intercepted Agent Actions</h2>
+          <p className="mt-0.5 text-xs font-medium text-[var(--muted)]">
             Every intercepted tool execution, evaluated against Moss security policies
           </p>
         </div>
@@ -49,18 +49,18 @@ export function InterceptionsView({
         <div className="flex flex-wrap items-center gap-3">
           {/* Search box */}
           <div className="relative">
-            <Search className="absolute left-3 top-2.5 size-3.5 text-[var(--muted)]" />
+            <Search className="absolute left-3 top-2.5 size-3.5 text-[var(--text)]" />
             <input
               type="text"
               placeholder="Search tool, agent, or reason..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-56 rounded-xl border border-[var(--line)] bg-black/40 pl-9 pr-8 py-1.5 text-xs text-white outline-none focus:border-[var(--cyan)]"
+              className="w-56 rounded-xl border-2 border-[var(--line)] bg-[#fffdfa] pl-9 pr-8 py-1.5 text-xs font-medium text-[var(--text)] outline-none shadow-[2px_2px_0_var(--line)] focus:ring-2 focus:ring-[var(--cyan)]/40"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-2.5 text-[var(--muted)] hover:text-white"
+                className="absolute right-2.5 top-2.5 text-[var(--text)] hover:opacity-75"
                 title="Clear search"
               >
                 <X className="size-3" />
@@ -69,15 +69,15 @@ export function InterceptionsView({
           </div>
 
           {/* Verdict filter tabs */}
-          <div className="flex rounded-xl border border-[var(--line)] bg-black/20 p-0.5 text-xs">
+          <div className="flex rounded-xl border-2 border-[var(--line)] bg-[var(--panel2)] p-0.5 text-xs shadow-[2px_2px_0_var(--line)]">
             {['ALL', 'ALLOW', 'BLOCK', 'REQUIRE_APPROVAL'].map((v) => (
               <button
                 key={v}
                 onClick={() => setFilterVerdict(v)}
-                className={`rounded-lg px-2.5 py-1 text-[11px] font-medium transition ${
+                className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition cursor-pointer ${
                   filterVerdict === v
-                    ? 'bg-white/10 text-white shadow'
-                    : 'text-[var(--muted)] hover:text-white'
+                    ? 'border-2 border-[var(--line)] bg-white text-[var(--text)] shadow-[2px_2px_0_var(--line)]'
+                    : 'text-[var(--text)] hover:bg-white/50'
                 }`}
               >
                 {v === 'REQUIRE_APPROVAL' ? 'APPROVAL' : v}
@@ -110,23 +110,23 @@ export function InterceptionsView({
           }
         />
       ) : (
-        <div className="divide-y divide-[var(--line)]">
+        <div className="divide-y-2 divide-[var(--line)]">
           {filtered.map((item) => (
             <button
               key={item.action_id}
               onClick={() => onOpenItem(item)}
-              className="flex w-full items-center gap-4 p-4 text-left transition hover:bg-white/[0.02]"
+              className="flex w-full items-center gap-4 p-4 text-left transition hover:bg-[var(--cyan)]/10 cursor-pointer"
             >
-              <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-white/5 text-[var(--cyan)]">
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-xl border-2 border-[var(--line)] bg-[var(--cyan)] text-[var(--text)] shadow-[2px_2px_0_var(--line)]">
                 <Activity className="size-4" />
               </div>
 
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-white text-xs">{item.tool_name}</span>
-                  <span className="font-mono text-[10px] text-[var(--muted)]">{item.agent_id}</span>
+                  <span className="font-bold text-[var(--text)] text-xs">{item.tool_name}</span>
+                  <span className="font-mono text-[10px] font-bold text-[#134e56]">{item.agent_id}</span>
                 </div>
-                <div className="mt-1 truncate text-xs text-[var(--muted)]">{item.reason}</div>
+                <div className="mt-1 truncate text-xs font-medium text-[var(--text)]">{item.reason}</div>
               </div>
 
               <div className="flex items-center gap-3 shrink-0">
@@ -134,15 +134,15 @@ export function InterceptionsView({
                 <Badge kind={item.verdict}>{item.verdict}</Badge>
                 {item.latency && (
                   <div className="hidden text-right font-mono text-[11px] sm:block">
-                    <div className="text-white font-medium">
+                    <div className="text-[var(--text)] font-bold">
                       {item.latency.total_latency_ms.toFixed(1)} ms
                     </div>
-                    <div className="text-[10px] text-[var(--muted)]">
+                    <div className="text-[10px] font-bold text-[var(--muted)]">
                       Moss: {item.latency.moss_retrieval_ms.toFixed(1)}ms
                     </div>
                   </div>
                 )}
-                <ChevronRight className="size-4 text-[var(--muted)]" />
+                <ChevronRight className="size-4 text-[var(--text)]" />
               </div>
             </button>
           ))}
