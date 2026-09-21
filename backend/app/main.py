@@ -41,18 +41,27 @@ async def lifespan(app: FastAPI):
 
         # Ingest and warm up the policy index
         seed_docs = format_policies_for_moss()
-        await provider.load_index(settings.POLICY_INDEX_NAME)
-        if hasattr(provider, "_loaded_indexes") and settings.POLICY_INDEX_NAME not in provider._loaded_indexes:
+        try:
+            await provider.load_index(settings.POLICY_INDEX_NAME)
+        except Exception:
             await provider.create_index(settings.POLICY_INDEX_NAME, seed_docs)
             await provider.load_index(settings.POLICY_INDEX_NAME)
 
-        # Initialize incident index
-        await provider.load_index(settings.INCIDENT_INDEX_NAME)
-        if hasattr(provider, "_loaded_indexes") and settings.INCIDENT_INDEX_NAME not in provider._loaded_indexes:
-            await provider.create_index(settings.INCIDENT_INDEX_NAME, [
-                {"id": "inc_init_001", "text": "System initialization baseline security precedent record.", "metadata": {"status": "initialized"}}
-            ])
-            await provider.load_index(settings.INCIDENT_INDEX_NAME)
+        # Ensure incident index exists for audit event logging
+        try:
+            if hasattr(provider, "client") and provider.client:
+                indexes = await provider.client.list_indexes()
+                idx_names = [idx.name for idx in indexes]
+                if settings.INCIDENT_INDEX_NAME not in idx_names:
+                    await provider.create_index(settings.INCIDENT_INDEX_NAME, [
+                        {"id": "inc_init_001", "text": "System initialization baseline security precedent record.", "metadata": {"status": "initialized"}}
+                    ])
+            elif hasattr(provider, "create_index"):
+                await provider.create_index(settings.INCIDENT_INDEX_NAME, [
+                    {"id": "inc_init_001", "text": "System initialization baseline security precedent record.", "metadata": {"status": "initialized"}}
+                ])
+        except Exception as e:
+            logger.info("Incident index initialization notice: %s", e)
 
         logger.info(f"Successfully seeded {len(seed_docs)} policies into Moss runtime.")
         logger.info("AgentGuard Sub-10ms Security Engine is HOT and ready for evaluation.")
